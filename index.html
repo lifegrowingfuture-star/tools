@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Eugenistudio - Dashboard Tecnica</title>
+  <meta name="description" content="Piattaforma di strumenti tecnici professionali - Orologi mondiali, fasi lunari e tools di calcolo.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: hsl(220, 20%, 97%);
+      --fg: hsl(220, 25%, 10%);
+      --card: hsl(0, 0%, 100%);
+      --card-fg: hsl(220, 25%, 10%);
+      --primary: hsl(220, 70%, 45%);
+      --primary-fg: hsl(0, 0%, 100%);
+      --secondary: hsl(220, 15%, 92%);
+      --secondary-fg: hsl(220, 25%, 15%);
+      --muted: hsl(220, 15%, 94%);
+      --muted-fg: hsl(220, 10%, 45%);
+      --border: hsl(220, 13%, 88%);
+      --radius: 0.625rem;
+      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.03), 0 1px 3px 0 rgb(0 0 0 / 0.06);
+      --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.07), 0 4px 6px -4px rgb(0 0 0 / 0.05);
+      --moon-light: hsl(45, 90%, 85%);
+    }
+
+    .dark {
+      --bg: hsl(220, 20%, 7%);
+      --fg: hsl(220, 10%, 95%);
+      --card: hsl(220, 20%, 10%);
+      --card-fg: hsl(220, 10%, 95%);
+      --primary: hsl(220, 70%, 55%);
+      --primary-fg: hsl(0, 0%, 100%);
+      --secondary: hsl(220, 15%, 18%);
+      --secondary-fg: hsl(220, 10%, 90%);
+      --muted: hsl(220, 15%, 15%);
+      --muted-fg: hsl(220, 10%, 55%);
+      --border: hsl(220, 15%, 20%);
+      --moon-light: hsl(45, 80%, 75%);
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background-color: var(--bg);
+      color: var(--fg);
+      line-height: 1.6;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    .font-display { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+
+    /* Layout */
+    .container { max-width: 1152px; margin: 0 auto; padding: 0 1rem; }
+
+    /* Header */
+    .header {
+      position: sticky; top: 0; z-index: 50;
+      backdrop-filter: blur(12px);
+      background-color: color-mix(in srgb, var(--bg) 80%, transparent);
+      border-bottom: 1px solid var(--border);
+    }
+    .header-inner {
+      display: flex; align-items: center; justify-content: space-between; height: 64px;
+    }
+    .logo { display: flex; align-items: center; gap: 0.5rem; text-decoration: none; color: var(--fg); }
+    .logo:hover .logo-icon { color: var(--primary); }
+    .logo-icon { color: var(--muted-fg); transition: color 0.2s; width: 20px; height: 20px; }
+    .logo-text { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 1.125rem; letter-spacing: -0.025em; }
+    .logo-text span { color: var(--primary); }
+    .header-right { display: flex; align-items: center; gap: 0.75rem; }
+    .header-label { display: flex; align-items: center; gap: 0.25rem; font-size: 0.875rem; color: var(--muted-fg); }
+
+    /* Theme Toggle */
+    .theme-toggle {
+      width: 36px; height: 36px; border-radius: var(--radius);
+      border: 1px solid var(--border); background: var(--card);
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      color: var(--fg); transition: all 0.2s;
+    }
+    .theme-toggle:hover { background: var(--muted); }
+    .theme-toggle svg { width: 18px; height: 18px; }
+
+    /* Cards */
+    .card {
+      background: var(--card); color: var(--card-fg);
+      border: 1px solid var(--border); border-radius: var(--radius);
+      box-shadow: var(--shadow-sm); transition: all 0.2s;
+    }
+    .card-interactive:hover {
+      box-shadow: var(--shadow-md); border-color: var(--primary);
+      transform: translateY(-1px);
+    }
+
+    /* Badge */
+    .badge {
+      display: inline-flex; align-items: center;
+      padding: 0.125rem 0.625rem; font-size: 0.75rem; font-weight: 500;
+      border-radius: 9999px;
+      background: var(--secondary); color: var(--secondary-fg);
+    }
+
+    /* Section Header */
+    .section-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; }
+    .section-icon {
+      width: 40px; height: 40px; border-radius: var(--radius);
+      background: color-mix(in srgb, var(--primary) 10%, transparent);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .section-icon svg { width: 20px; height: 20px; color: var(--primary); }
+    .section-title { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 1.25rem; font-weight: 700; letter-spacing: -0.025em; }
+    .section-subtitle { font-size: 0.875rem; color: var(--muted-fg); }
+
+    /* Grids */
+    .clocks-grid {
+      display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;
+    }
+    @media (min-width: 640px) { .clocks-grid { grid-template-columns: repeat(3, 1fr); } }
+    @media (min-width: 1024px) { .clocks-grid { grid-template-columns: repeat(6, 1fr); } }
+
+    .tools-grid {
+      display: grid; grid-template-columns: 1fr; gap: 1rem;
+    }
+    @media (min-width: 640px) { .tools-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (min-width: 1024px) { .tools-grid { grid-template-columns: repeat(4, 1fr); } }
+
+    /* Clock card */
+    .clock-card { text-align: center; padding: 1.25rem 1rem; }
+    .clock-emoji { font-size: 1.125rem; margin-bottom: 0.5rem; }
+    .clock-svg { width: 80px; height: 80px; margin: 0 auto 0.75rem; }
+    .clock-time { font-family: 'JetBrains Mono', monospace; font-size: 1.125rem; font-weight: 700; letter-spacing: 0.05em; }
+    .clock-city { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 600; font-size: 0.875rem; margin-top: 0.25rem; }
+    .clock-country { font-size: 0.75rem; color: var(--muted-fg); margin-top: 0.125rem; }
+    .clock-date { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--muted-fg); margin-top: 0.25rem; }
+
+    /* Moon Section */
+    .moon-grid {
+      display: grid; grid-template-columns: 1fr; gap: 2rem; align-items: center;
+    }
+    @media (min-width: 768px) { .moon-grid { grid-template-columns: auto 1fr; } }
+    .moon-visual { text-align: center; }
+    .moon-svg { width: 144px; height: 144px; margin: 0 auto; filter: drop-shadow(0 4px 8px rgb(0 0 0 / 0.15)); }
+    .moon-emoji { font-size: 1.5rem; margin-top: 0.75rem; }
+    .moon-name { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 1.125rem; margin-top: 0.25rem; }
+    .moon-info-grid {
+      display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;
+    }
+    @media (min-width: 640px) { .moon-info-grid { grid-template-columns: repeat(3, 1fr); } }
+    .info-card {
+      border-radius: var(--radius); background: color-mix(in srgb, var(--muted) 50%, transparent);
+      padding: 1rem; box-shadow: var(--shadow-sm);
+    }
+    .info-card-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem; }
+    .info-card-header svg { width: 16px; height: 16px; }
+    .info-card-label { font-size: 0.75rem; color: var(--muted-fg); font-weight: 500; }
+    .info-card-value { font-family: 'JetBrains Mono', monospace; font-size: 0.875rem; font-weight: 700; }
+
+    /* Tool card */
+    .tool-card { padding: 1.25rem; opacity: 0.7; transition: opacity 0.2s; cursor: default; }
+    .tool-card:hover { opacity: 1; }
+    .tool-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 0.75rem; }
+    .tool-icon {
+      width: 40px; height: 40px; border-radius: var(--radius);
+      background: var(--muted); display: flex; align-items: center; justify-content: center;
+    }
+    .tool-icon svg { width: 20px; height: 20px; color: var(--muted-fg); }
+    .tool-name { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 600; font-size: 0.875rem; margin-bottom: 0.25rem; }
+    .tool-desc { font-size: 0.75rem; color: var(--muted-fg); line-height: 1.5; }
+
+    /* Page Header */
+    .page-header { margin-bottom: 0.5rem; }
+    .page-title {
+      font-family: 'Plus Jakarta Sans', sans-serif; font-size: 2rem; font-weight: 700;
+      letter-spacing: -0.025em; margin-bottom: 0.5rem;
+    }
+    @media (min-width: 640px) { .page-title { font-size: 2.25rem; } }
+    .page-desc { color: var(--muted-fg); }
+
+    /* Footer */
+    .footer {
+      padding: 1.5rem 0; border-top: 1px solid var(--border); margin-top: 2rem;
+    }
+    .footer-inner {
+      display: flex; align-items: center; justify-content: space-between;
+      font-size: 0.875rem; color: var(--muted-fg);
+    }
+    .footer a { color: var(--muted-fg); text-decoration: none; transition: color 0.2s; }
+    .footer a:hover { color: var(--primary); }
+
+    /* Sections spacing */
+    .sections { padding: 2rem 0; display: flex; flex-direction: column; gap: 2.5rem; }
+
+    /* SVG helpers */
+    .stroke-border { stroke: var(--border); }
+    .stroke-fg { stroke: var(--fg); }
+    .stroke-primary { stroke: var(--primary); }
+    .fill-primary { fill: var(--primary); }
+    .fill-muted { fill: var(--muted); }
+    .fill-muted-half { fill: color-mix(in srgb, var(--muted) 50%, transparent); }
+    .stroke-muted-fg { stroke: var(--muted-fg); }
+    .fill-crater { fill: color-mix(in srgb, var(--muted-fg) 5%, transparent); }
+    .fill-moon-light { fill: var(--moon-light); }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .fade-in { animation: fadeIn 0.5s ease forwards; opacity: 0; }
+    .fade-in-1 { animation-delay: 0.1s; }
+    .fade-in-2 { animation-delay: 0.2s; }
+    .fade-in-3 { animation-delay: 0.3s; }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="container">
+      <div class="header-inner">
+        <a href="#" class="logo">
+          <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
+          <span class="logo-text">Eugeni<span>studio</span></span>
+        </a>
+        <div class="header-right">
+          <div class="header-label">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>
+            <span>Dashboard</span>
+          </div>
+          <button class="theme-toggle" id="themeToggle" title="Cambia tema">
+            <svg id="sunIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+            <svg id="moonIcon" style="display:none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <div class="container">
+    <div class="sections">
+
+      <!-- Page Header -->
+      <div class="page-header fade-in">
+        <h1 class="page-title">Dashboard</h1>
+        <p class="page-desc">Panoramica in tempo reale con orologi, fasi lunari e strumenti tecnici.</p>
+      </div>
+
+      <!-- World Clocks -->
+      <section class="fade-in fade-in-1">
+        <div class="section-header">
+          <div class="section-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
+          </div>
+          <div>
+            <h2 class="section-title">Orologi Mondiali</h2>
+            <p class="section-subtitle">Ora locale in tempo reale</p>
+          </div>
+        </div>
+        <div class="clocks-grid" id="clocksGrid"></div>
+      </section>
+
+      <!-- Moon Phase -->
+      <section class="fade-in fade-in-2">
+        <div class="section-header">
+          <div class="section-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+          </div>
+          <div>
+            <h2 class="section-title">Fase Lunare</h2>
+            <p class="section-subtitle">Fase lunare corrente e informazioni</p>
+          </div>
+        </div>
+        <div class="card" id="moonCard" style="padding:1.5rem;"></div>
+      </section>
+
+      <!-- Tools Grid -->
+      <section class="fade-in fade-in-3">
+        <div class="section-header">
+          <div class="section-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+          </div>
+          <div>
+            <h2 class="section-title">Strumenti Tecnici</h2>
+            <p class="section-subtitle">Tools di calcolo e conversione</p>
+          </div>
+        </div>
+        <div class="tools-grid" id="toolsGrid"></div>
+      </section>
+
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <span>&copy; <span id="footerYear"></span> Eugenistudio</span>
+        <span class="font-mono" style="font-size:0.75rem;">eugenistudio.it</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // ==================== THEME TOGGLE ====================
+    const themeToggle = document.getElementById('themeToggle');
+    const sunIcon = document.getElementById('sunIcon');
+    const moonIcon = document.getElementById('moonIcon');
+    let isDark = localStorage.getItem('theme') === 'dark';
+
+    function applyTheme() {
+      document.documentElement.classList.toggle('dark', isDark);
+      sunIcon.style.display = isDark ? 'none' : 'block';
+      moonIcon.style.display = isDark ? 'block' : 'none';
+    }
+    applyTheme();
+
+    themeToggle.addEventListener('click', () => {
+      isDark = !isDark;
+      localStorage.setItem('theme', isDark ? 'dark' : 'light');
+      applyTheme();
+    });
+
+    // ==================== FOOTER YEAR ====================
+    document.getElementById('footerYear').textContent = new Date().getFullYear();
+
+    // ==================== CITIES DATA ====================
+    const CITIES = [
+      { city: 'Roma', timezone: 'Europe/Rome', country: 'Italia', emoji: '\u{1F1EE}\u{1F1F9}' },
+      { city: 'Londra', timezone: 'Europe/London', country: 'Regno Unito', emoji: '\u{1F1EC}\u{1F1E7}' },
+      { city: 'New York', timezone: 'America/New_York', country: 'USA', emoji: '\u{1F1FA}\u{1F1F8}' },
+      { city: 'Tokyo', timezone: 'Asia/Tokyo', country: 'Giappone', emoji: '\u{1F1EF}\u{1F1F5}' },
+      { city: 'Sydney', timezone: 'Australia/Sydney', country: 'Australia', emoji: '\u{1F1E6}\u{1F1FA}' },
+      { city: 'Dubai', timezone: 'Asia/Dubai', country: 'EAU', emoji: '\u{1F1E6}\u{1F1EA}' },
+    ];
+
+    // ==================== WORLD CLOCKS ====================
+    function formatTime(date, tz) {
+      try {
+        return date.toLocaleTimeString('it-IT', { timeZone: tz, hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+      } catch { return '--:--:--'; }
+    }
+    function formatDate(date, tz) {
+      try {
+        return date.toLocaleDateString('it-IT', { timeZone: tz, weekday: 'short', day: 'numeric', month: 'short' });
+      } catch { return ''; }
+    }
+    function getUtcOffset(date, tz) {
+      try {
+        const parts = new Intl.DateTimeFormat('en-US', { timeZone: tz, timeZoneName: 'shortOffset' }).formatToParts(date);
+        const p = parts.find(p => p.type === 'timeZoneName');
+        return p ? p.value : '';
+      } catch { return ''; }
+    }
+    function getTimeParts(date, tz) {
+      try {
+        const parts = new Intl.DateTimeFormat('en-US', { timeZone: tz, hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: false }).formatToParts(date);
+        return {
+          hours: parseInt(parts.find(p => p.type === 'hour')?.value || '0'),
+          minutes: parseInt(parts.find(p => p.type === 'minute')?.value || '0'),
+          seconds: parseInt(parts.find(p => p.type === 'second')?.value || '0'),
+        };
+      } catch { return { hours: 0, minutes: 0, seconds: 0 }; }
+    }
+
+    function drawClockSVG(h, m, s) {
+      const hourAngle = ((h % 12) + m / 60) * 30;
+      const minAngle = (m + s / 60) * 6;
+      const secAngle = s * 6;
+      const toRad = a => a * Math.PI / 180;
+
+      let markers = '';
+      for (let i = 0; i < 12; i++) {
+        const angle = toRad(i * 30);
+        const x1 = 50 + 40 * Math.sin(angle), y1 = 50 - 40 * Math.cos(angle);
+        const x2 = 50 + 44 * Math.sin(angle), y2 = 50 - 44 * Math.cos(angle);
+        markers += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" class="stroke-muted-fg" stroke-width="${i % 3 === 0 ? 2.5 : 1}" stroke-linecap="round"/>`;
+      }
+
+      return `<svg viewBox="0 0 100 100" class="clock-svg">
+        <circle cx="50" cy="50" r="48" class="fill-muted-half stroke-border" stroke-width="2"/>
+        ${markers}
+        <line x1="50" y1="50" x2="${50 + 24 * Math.sin(toRad(hourAngle))}" y2="${50 - 24 * Math.cos(toRad(hourAngle))}" class="stroke-fg" stroke-width="3" stroke-linecap="round"/>
+        <line x1="50" y1="50" x2="${50 + 34 * Math.sin(toRad(minAngle))}" y2="${50 - 34 * Math.cos(toRad(minAngle))}" class="stroke-fg" stroke-width="2" stroke-linecap="round"/>
+        <line x1="50" y1="55" x2="${50 + 36 * Math.sin(toRad(secAngle))}" y2="${50 - 36 * Math.cos(toRad(secAngle))}" class="stroke-primary" stroke-width="1" stroke-linecap="round"/>
+        <circle cx="50" cy="50" r="3" class="fill-primary"/>
+      </svg>`;
+    }
+
+    function renderClocks() {
+      const now = new Date();
+      const grid = document.getElementById('clocksGrid');
+      grid.innerHTML = CITIES.map(c => {
+        const t = getTimeParts(now, c.timezone);
+        return `<div class="card card-interactive clock-card">
+          <div class="clock-emoji">${c.emoji}</div>
+          ${drawClockSVG(t.hours, t.minutes, t.seconds)}
+          <div class="clock-time">${formatTime(now, c.timezone)}</div>
+          <div class="clock-city">${c.city}</div>
+          <div class="clock-country">${c.country}</div>
+          <div class="clock-date">${formatDate(now, c.timezone)} &middot; ${getUtcOffset(now, c.timezone)}</div>
+        </div>`;
+      }).join('');
+    }
+
+    renderClocks();
+    setInterval(renderClocks, 1000);
+
+    // ==================== MOON PHASE ====================
+    function calculateMoonPhase(date) {
+      const year = date.getFullYear();
+      const month = date.getMonth();
+      const day = date.getDate();
+      let c, e;
+      if (month < 3) { c = year - 1; e = month + 13; }
+      else { c = year; e = month + 1; }
+      const jd = Math.floor(365.25 * (c + 4716)) + Math.floor(30.6001 * e) + day - 1524.5;
+      const daysSinceNew = jd - 2451549.5;
+      const newMoons = daysSinceNew / 29.53058770576;
+      const phase = newMoons - Math.floor(newMoons);
+      const age = phase * 29.53058770576;
+      const illumination = (1 - Math.cos(phase * 2 * Math.PI)) / 2;
+
+      let phaseName, emoji;
+      if (phase < 0.03 || phase > 0.97) { phaseName = 'Luna Nuova'; emoji = '\u{1F311}'; }
+      else if (phase < 0.22) { phaseName = 'Crescente'; emoji = '\u{1F312}'; }
+      else if (phase < 0.28) { phaseName = 'Primo Quarto'; emoji = '\u{1F313}'; }
+      else if (phase < 0.47) { phaseName = 'Gibbosa Crescente'; emoji = '\u{1F314}'; }
+      else if (phase < 0.53) { phaseName = 'Luna Piena'; emoji = '\u{1F315}'; }
+      else if (phase < 0.72) { phaseName = 'Gibbosa Calante'; emoji = '\u{1F316}'; }
+      else if (phase < 0.78) { phaseName = 'Ultimo Quarto'; emoji = '\u{1F317}'; }
+      else { phaseName = 'Calante'; emoji = '\u{1F318}'; }
+
+      const daysUntilFull = phase < 0.5 ? (0.5 - phase) * 29.53 : (1.5 - phase) * 29.53;
+      const daysUntilNew = (1 - phase) * 29.53;
+
+      return { phase, illumination: Math.round(illumination * 100), phaseName, emoji, daysUntilFull: Math.round(daysUntilFull), daysUntilNew: Math.round(daysUntilNew), age: Math.round(age * 10) / 10 };
+    }
+
+    function drawMoonSVG(phase, illumination) {
+      const isWaxing = phase < 0.5;
+      const ill = illumination / 100;
+      const rx = Math.abs(1 - 2 * ill) * 50;
+
+      let path = '';
+      if (ill > 0.01) {
+        const sweepOuter = isWaxing ? 0 : 1;
+        const sweepInner = (isWaxing && ill < 0.5) || (!isWaxing && ill > 0.5) ? 0 : 1;
+        path = `<path d="M 50 2 A 48 48 0 0 ${sweepOuter} 50 98 A ${rx} 48 0 0 ${sweepInner} 50 2" class="fill-moon-light"/>`;
+      }
+
+      return `<svg viewBox="0 0 100 100" class="moon-svg">
+        <circle cx="50" cy="50" r="48" class="fill-muted"/>
+        ${path}
+        <circle cx="50" cy="50" r="48" fill="none" class="stroke-border" stroke-width="1"/>
+        <circle cx="35" cy="35" r="6" class="fill-crater"/>
+        <circle cx="58" cy="42" r="8" class="fill-crater"/>
+        <circle cx="42" cy="62" r="5" class="fill-crater"/>
+        <circle cx="62" cy="65" r="4" class="fill-crater"/>
+      </svg>`;
+    }
+
+    function renderMoon() {
+      const data = calculateMoonPhase(new Date());
+      const moonCard = document.getElementById('moonCard');
+      const sunSvg = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#EAB308" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>';
+      const moonSvg = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--primary)"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>';
+      const calSvg = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--primary)"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></svg>';
+      const calMuted = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--muted-fg)"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></svg>';
+      const globeSvg = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--primary)"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>';
+      const moonMuted = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--muted-fg)"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>';
+
+      moonCard.innerHTML = `<div class="moon-grid">
+        <div class="moon-visual">
+          ${drawMoonSVG(data.phase, data.illumination)}
+          <div class="moon-emoji">${data.emoji}</div>
+          <h3 class="moon-name">${data.phaseName}</h3>
+        </div>
+        <div class="moon-info-grid">
+          <div class="info-card"><div class="info-card-header">${sunSvg}<span class="info-card-label">Illuminazione</span></div><div class="info-card-value">${data.illumination}%</div></div>
+          <div class="info-card"><div class="info-card-header">${moonSvg}<span class="info-card-label">Et\u00e0 Lunare</span></div><div class="info-card-value">${data.age} giorni</div></div>
+          <div class="info-card"><div class="info-card-header">${calSvg}<span class="info-card-label">Prossima Luna Piena</span></div><div class="info-card-value">tra ${data.daysUntilFull} giorni</div></div>
+          <div class="info-card"><div class="info-card-header">${calMuted}<span class="info-card-label">Prossima Luna Nuova</span></div><div class="info-card-value">tra ${data.daysUntilNew} giorni</div></div>
+          <div class="info-card"><div class="info-card-header">${moonMuted}<span class="info-card-label">Fase</span></div><div class="info-card-value">${Math.round(data.phase * 100)}%</div></div>
+          <div class="info-card"><div class="info-card-header">${globeSvg}<span class="info-card-label">Ciclo Lunare</span></div><div class="info-card-value">29.5 giorni</div></div>
+        </div>
+      </div>`;
+    }
+    renderMoon();
+
+    // ==================== TOOLS GRID ====================
+    const TOOLS = [
+      { name: 'Calcolatrice Scientifica', desc: 'Calcoli avanzati con funzioni trigonometriche e logaritmiche.', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="16" height="20" x="4" y="2" rx="2"/><line x1="8" x2="16" y1="6" y2="6"/><line x1="16" x2="16" y1="14" y2="18"/><path d="M16 10h.01"/><path d="M12 10h.01"/><path d="M8 10h.01"/><path d="M12 14h.01"/><path d="M8 14h.01"/><path d="M12 18h.01"/><path d="M8 18h.01"/></svg>' },
+      { name: 'Conversione Unit\u00e0', desc: 'Conversione tra unit\u00e0 di misura di ogni tipo.', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3 4 7l4 4"/><path d="M4 7h16"/><path d="m16 21 4-4-4-4"/><path d="M20 17H4"/></svg>' },
+      { name: 'Analisi Dati', desc: 'Strumenti di analisi statistica e visualizzazione.', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>' },
+      { name: 'Algebra Lineare', desc: 'Matrici, determinanti, sistemi di equazioni.', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 7V4H6l6 8-6 8h12v-3"/></svg>' },
+      { name: 'Geometria', desc: 'Calcolo aree, volumi, perimetri e propriet\u00e0 geometriche.', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z"/><path d="m14.5 12.5 2-2"/></svg>' },
+      { name: 'Conversione Basi', desc: 'Conversione tra basi numeriche: binario, ottale, esadecimale.', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="14" y="14" width="4" height="6" rx="2"/><rect x="6" y="4" width="4" height="6" rx="2"/><path d="M6 20h4"/><path d="M14 10h4"/><path d="M6 14h2v6"/><path d="M14 4h2v6"/></svg>' },
+      { name: 'Calcolo Percentuali', desc: 'Percentuali, incrementi, ricarichi e sconti.', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" x2="5" y1="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>' },
+      { name: 'Formule Chimiche', desc: 'Calcolo masse molari e bilanciamento equazioni.', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2v7.527a2 2 0 0 1-.211.896L4.72 20.55a1 1 0 0 0 .9 1.45h12.76a1 1 0 0 0 .9-1.45l-5.069-10.127A2 2 0 0 1 14 9.527V2"/><path d="M8.5 2h7"/><path d="M7 16h10"/></svg>' },
+    ];
+
+    const toolsGrid = document.getElementById('toolsGrid');
+    toolsGrid.innerHTML = TOOLS.map(t => `<div class="card tool-card">
+      <div class="tool-header">
+        <div class="tool-icon">${t.icon}</div>
+        <span class="badge">Coming Soon</span>
+      </div>
+      <div class="tool-name">${t.name}</div>
+      <div class="tool-desc">${t.desc}</div>
+    </div>`).join('');
+  </script>
+
+</body>
+</html>
