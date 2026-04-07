@@ -295,6 +295,80 @@
     .tl-stat { background: color-mix(in srgb, var(--muted) 60%, transparent); border-radius: var(--radius); padding: 0.75rem; text-align: center; }
     .tl-stat-val { font-family: 'JetBrains Mono', monospace; font-size: 0.875rem; font-weight: 700; }
     .tl-stat-lbl { font-size: 0.65rem; color: var(--muted-fg); margin-top: 0.125rem; text-transform: uppercase; letter-spacing: 0.04em; }
+
+    /* Humidity Tool Modal */
+    .hum-overlay {
+      display: none; position: fixed; inset: 0; z-index: 100;
+      background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);
+      align-items: center; justify-content: center; padding: 1rem;
+    }
+    .hum-overlay.open { display: flex; }
+    .hum-modal {
+      background: var(--card); color: var(--card-fg);
+      border: 1px solid var(--border); border-radius: calc(var(--radius) * 1.5);
+      box-shadow: var(--shadow-lg); width: 100%; max-width: 620px;
+      padding: 1.75rem; position: relative;
+      animation: fadeIn 0.25s ease forwards;
+      max-height: 90vh; overflow-y: auto;
+    }
+    .hum-modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; }
+    .hum-modal-title { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 1.125rem; display: flex; align-items: center; gap: 0.625rem; }
+    .hum-modal-title svg { color: var(--primary); }
+    .hum-close {
+      width: 32px; height: 32px; border-radius: var(--radius);
+      border: 1px solid var(--border); background: var(--muted);
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      color: var(--muted-fg); transition: all 0.2s;
+    }
+    .hum-close:hover { background: var(--secondary); color: var(--fg); }
+    .hum-ingredients { display: flex; flex-direction: column; gap: 0.625rem; margin-bottom: 1.25rem; }
+    .hum-row {
+      display: grid; grid-template-columns: 1fr 100px 100px; gap: 0.625rem; align-items: center;
+    }
+    @media (max-width: 480px) { .hum-row { grid-template-columns: 1fr 80px 80px; } }
+    .hum-row-header {
+      display: grid; grid-template-columns: 1fr 100px 100px; gap: 0.625rem;
+      margin-bottom: 0.25rem;
+    }
+    @media (max-width: 480px) { .hum-row-header { grid-template-columns: 1fr 80px 80px; } }
+    .hum-col-label { font-size: 0.7rem; font-weight: 600; color: var(--muted-fg); text-transform: uppercase; letter-spacing: 0.05em; }
+    .hum-input-name {
+      width: 100%; padding: 0.5rem 0.75rem;
+      border: 1px solid var(--border); border-radius: var(--radius);
+      background: var(--muted); color: var(--fg);
+      font-family: 'DM Sans', sans-serif; font-size: 0.875rem;
+      outline: none; transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .hum-input-name:focus { border-color: var(--primary); box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 15%, transparent); }
+    .hum-input-num {
+      width: 100%; padding: 0.5rem 0.5rem;
+      border: 1px solid var(--border); border-radius: var(--radius);
+      background: var(--muted); color: var(--fg);
+      font-family: 'JetBrains Mono', monospace; font-size: 0.875rem; font-weight: 600;
+      outline: none; text-align: right; transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .hum-input-num:focus { border-color: var(--primary); box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 15%, transparent); }
+    .hum-input-num::placeholder { color: var(--muted-fg); font-weight: 400; }
+    .hum-divider { border: none; border-top: 1px solid var(--border); margin: 1.25rem 0; }
+    .hum-results { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .hum-result-card {
+      background: color-mix(in srgb, var(--primary) 8%, transparent);
+      border: 1px solid color-mix(in srgb, var(--primary) 25%, transparent);
+      border-radius: var(--radius); padding: 1.25rem;
+    }
+    .hum-result-label { font-size: 0.75rem; font-weight: 600; color: var(--primary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; }
+    .hum-result-main { font-family: 'JetBrains Mono', monospace; font-size: 1.75rem; font-weight: 700; color: var(--primary); line-height: 1; }
+    .hum-result-sub { font-size: 0.75rem; color: var(--muted-fg); margin-top: 0.375rem; }
+    .hum-bar-wrap { margin-top: 1rem; }
+    .hum-bar-label { font-size: 0.75rem; color: var(--muted-fg); margin-bottom: 0.375rem; display: flex; justify-content: space-between; }
+    .hum-bar-track {
+      height: 8px; border-radius: 9999px;
+      background: var(--muted); overflow: hidden;
+    }
+    .hum-bar-fill {
+      height: 100%; border-radius: 9999px;
+      background: var(--primary); transition: width 0.4s ease;
+    }
   </style>
 </head>
 <body>
@@ -443,6 +517,50 @@
         <div class="tl-stat">
           <div class="tl-stat-val" id="tlStatRec">--</div>
           <div class="tl-stat-lbl">Tempo reale ripreso</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Humidity Tool Modal -->
+  <div class="hum-overlay" id="humOverlay">
+    <div class="hum-modal">
+      <div class="hum-modal-header">
+        <div class="hum-modal-title">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
+          Calcolo Umidità Ingredienti
+        </div>
+        <button class="hum-close" id="humClose" title="Chiudi">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+        </button>
+      </div>
+
+      <div class="hum-row-header">
+        <span class="hum-col-label">Ingrediente</span>
+        <span class="hum-col-label" style="text-align:right">Peso (g)</span>
+        <span class="hum-col-label" style="text-align:right">Umidità (%)</span>
+      </div>
+
+      <div class="hum-ingredients" id="humIngredients">
+        <!-- righe generate da JS -->
+      </div>
+
+      <hr class="hum-divider">
+
+      <div class="hum-results">
+        <div class="hum-result-card">
+          <div class="hum-result-label">💧 Umidità media pesata</div>
+          <div class="hum-result-main" id="humResultPct">—</div>
+          <div class="hum-result-sub" id="humResultPctSub">Inserisci almeno un ingrediente</div>
+          <div class="hum-bar-wrap">
+            <div class="hum-bar-label"><span>0%</span><span>100%</span></div>
+            <div class="hum-bar-track"><div class="hum-bar-fill" id="humBar" style="width:0%"></div></div>
+          </div>
+        </div>
+        <div class="hum-result-card">
+          <div class="hum-result-label">⚖️ Peso totale ricetta</div>
+          <div class="hum-result-main" id="humResultWeight">—</div>
+          <div class="hum-result-sub" id="humResultWeightSub">Somma di tutti gli ingredienti</div>
         </div>
       </div>
     </div>
@@ -662,7 +780,7 @@
     // ==== TOOLS GRID ====
     const TOOLS = [
       { name: 'Time Lapse', desc: 'Calcola la durata del video finale in base a intervallo, durata ripresa e fps.', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4"/><path d="m16.2 7.8 2.9-2.9"/><path d="M18 12h4"/><path d="m16.2 16.2 2.9 2.9"/><path d="M12 18v4"/><path d="m4.9 19.1 2.9-2.9"/><path d="M2 12h4"/><path d="m4.9 4.9 2.9 2.9"/><circle cx="12" cy="12" r="4"/></svg>', active: true },
-      { name: 'Conversione Unit\u00e0', desc: 'Conversione tra unit\u00e0 di misura di ogni tipo.', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3 4 7l4 4"/><path d="M4 7h16"/><path d="m16 21 4-4-4-4"/><path d="M20 17H4"/></svg>' },
+      { name: 'Calcolo Umidit\u00e0', desc: 'Media pesata dell\u2019umidit\u00e0 per fino a 5 ingredienti: inserisci peso e umidit\u00e0 dichiarata per ottenere l\u2019umidit\u00e0 finale e il peso totale della ricetta.', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>', active: true, modal: 'humOverlay' },
       { name: 'Analisi Dati', desc: 'Strumenti di analisi statistica e visualizzazione.', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>' },
       { name: 'Algebra Lineare', desc: 'Matrici, determinanti, sistemi di equazioni.', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 7V4H6l6 8-6 8h12v-3"/></svg>' },
       { name: 'Geometria', desc: 'Calcolo aree, volumi, perimetri e propriet\u00e0 geometriche.', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z"/><path d="m14.5 12.5 2-2"/></svg>' },
@@ -672,14 +790,24 @@
     ];
 
     const toolsGrid = document.getElementById('toolsGrid');
-    toolsGrid.innerHTML = TOOLS.map(t => `<div class="card ${t.active ? 'tool-card-active' : 'tool-card'}" ${t.active ? 'onclick="document.getElementById(\'tlOverlay\').classList.add(\'open\'); calcTimeLapse();"' : ''}>
-      <div class="tool-header">
-        <div class="tool-icon">${t.icon}</div>
-        <span class="${t.active ? 'badge-active' : 'badge'}">${t.active ? 'Attivo' : 'Coming Soon'}</span>
-      </div>
-      <div class="tool-name">${t.name}</div>
-      <div class="tool-desc">${t.desc}</div>
-    </div>`).join('');
+    toolsGrid.innerHTML = TOOLS.map((t, i) => {
+      let onclickAttr = '';
+      if (t.active) {
+        if (t.modal) {
+          onclickAttr = `onclick="document.getElementById('${t.modal}').classList.add('open'); if(typeof initHumidity==='function') initHumidity();"`;
+        } else {
+          onclickAttr = `onclick="document.getElementById('tlOverlay').classList.add('open'); calcTimeLapse();"`;
+        }
+      }
+      return `<div class="card ${t.active ? 'tool-card-active' : 'tool-card'}" ${onclickAttr}>
+        <div class="tool-header">
+          <div class="tool-icon">${t.icon}</div>
+          <span class="${t.active ? 'badge-active' : 'badge'}">${t.active ? 'Attivo' : 'Coming Soon'}</span>
+        </div>
+        <div class="tool-name">${t.name}</div>
+        <div class="tool-desc">${t.desc}</div>
+      </div>`;
+    }).join('');
     // ==== TIME LAPSE CALCULATOR ====
     function calcTimeLapse() {
       const interval = parseFloat(document.getElementById('tlInterval').value) || 5;
