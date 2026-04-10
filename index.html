@@ -350,7 +350,9 @@
     .hum-input-num:focus { border-color: var(--primary); box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 15%, transparent); }
     .hum-input-num::placeholder { color: var(--muted-fg); font-weight: 400; }
     .hum-divider { border: none; border-top: 1px solid var(--border); margin: 1.25rem 0; }
-    .hum-results { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .hum-results { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+    @media (max-width: 480px) { .hum-results { grid-template-columns: 1fr 1fr; }
+      .hum-results .hum-result-card:last-child { grid-column: 1 / -1; } }
     .hum-result-card {
       background: color-mix(in srgb, var(--primary) 8%, transparent);
       border: 1px solid color-mix(in srgb, var(--primary) 25%, transparent);
@@ -561,6 +563,11 @@
           <div class="hum-result-label">⚖️ Peso totale ricetta</div>
           <div class="hum-result-main" id="humResultWeight">—</div>
           <div class="hum-result-sub" id="humResultWeightSub">Somma di tutti gli ingredienti</div>
+        </div>
+        <div class="hum-result-card">
+          <div class="hum-result-label">🚿 Acqua totale</div>
+          <div class="hum-result-main" id="humResultWater">—</div>
+          <div class="hum-result-sub" id="humResultWaterSub">Acqua contenuta negli ingredienti</div>
         </div>
       </div>
     </div>
@@ -851,6 +858,62 @@
     });
     ['tlInterval','tlDuration','tlDurUnit2','tlFps'].forEach(id =>
       document.getElementById(id).addEventListener('input', calcTimeLapse));
+
+    // ==== HUMIDITY CALCULATOR ====
+    function initHumidity() {
+      const container = document.getElementById('humIngredients');
+      if (container.children.length > 0) return;
+      for (let i = 0; i < 4; i++) {
+        const row = document.createElement('div');
+        row.className = 'hum-row';
+        row.innerHTML = `
+          <input class="hum-input-name" type="text" placeholder="Ingrediente ${i + 1}">
+          <input class="hum-input-num" type="number" placeholder="0" min="0" step="any" data-hum-weight>
+          <input class="hum-input-num" type="number" placeholder="0" min="0" max="100" step="any" data-hum-pct>`;
+        container.appendChild(row);
+      }
+      container.addEventListener('input', calcHumidity);
+    }
+
+    function calcHumidity() {
+      const weightEls = document.querySelectorAll('[data-hum-weight]');
+      const pctEls    = document.querySelectorAll('[data-hum-pct]');
+
+      let totalWeight = 0, weightedSum = 0;
+      weightEls.forEach((el, i) => {
+        const w = parseFloat(el.value) || 0;
+        const p = parseFloat(pctEls[i].value) || 0;
+        totalWeight  += w;
+        weightedSum  += w * p;
+      });
+
+      const avgHumidity = totalWeight > 0 ? weightedSum / totalWeight : 0;
+      const totalWater  = weightedSum / 100;
+
+      if (totalWeight > 0) {
+        document.getElementById('humResultPct').textContent     = avgHumidity.toFixed(1) + '%';
+        document.getElementById('humResultPctSub').textContent  = `Media pesata su ${totalWeight.toLocaleString('it-IT')} g`;
+        document.getElementById('humBar').style.width           = Math.min(avgHumidity, 100) + '%';
+        document.getElementById('humResultWeight').textContent  = totalWeight.toLocaleString('it-IT') + ' g';
+        document.getElementById('humResultWeightSub').textContent = 'Somma di tutti gli ingredienti';
+        document.getElementById('humResultWater').textContent   = totalWater.toFixed(1) + ' g';
+        document.getElementById('humResultWaterSub').textContent = `${avgHumidity.toFixed(1)}% di ${totalWeight.toLocaleString('it-IT')} g`;
+      } else {
+        document.getElementById('humResultPct').textContent     = '—';
+        document.getElementById('humResultPctSub').textContent  = 'Inserisci almeno un ingrediente';
+        document.getElementById('humBar').style.width           = '0%';
+        document.getElementById('humResultWeight').textContent  = '—';
+        document.getElementById('humResultWeightSub').textContent = 'Somma di tutti gli ingredienti';
+        document.getElementById('humResultWater').textContent   = '—';
+        document.getElementById('humResultWaterSub').textContent = 'Acqua contenuta negli ingredienti';
+      }
+    }
+
+    document.getElementById('humClose').addEventListener('click', () =>
+      document.getElementById('humOverlay').classList.remove('open'));
+    document.getElementById('humOverlay').addEventListener('click', e => {
+      if (e.target === e.currentTarget) e.currentTarget.classList.remove('open');
+    });
   </script>
 
 </body>
