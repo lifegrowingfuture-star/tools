@@ -371,6 +371,38 @@
       height: 100%; border-radius: 9999px;
       background: var(--primary); transition: width 0.4s ease;
     }
+
+    /* Language Switcher */
+    .lang-switcher { position: relative; }
+    .lang-toggle {
+      display: flex; align-items: center; gap: 0.375rem;
+      height: 36px; padding: 0 0.625rem;
+      border: 1px solid var(--border); border-radius: var(--radius);
+      background: var(--card); color: var(--fg); cursor: pointer;
+      font-size: 0.8rem; font-weight: 700; font-family: 'JetBrains Mono', monospace;
+      letter-spacing: 0.04em; transition: all 0.2s;
+    }
+    .lang-toggle:hover { background: var(--muted); }
+    .lang-toggle .lt-globe { width: 15px; height: 15px; color: var(--muted-fg); flex-shrink: 0; }
+    .lang-toggle .lt-chevron { width: 12px; height: 12px; color: var(--muted-fg); flex-shrink: 0; transition: transform 0.2s; }
+    .lang-switcher.open .lt-chevron { transform: rotate(180deg); }
+    .lang-dropdown {
+      display: none; position: absolute; top: calc(100% + 0.375rem); right: 0;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--radius); box-shadow: var(--shadow-lg);
+      min-width: 148px; z-index: 200; overflow: hidden;
+      animation: fadeIn 0.15s ease forwards;
+    }
+    .lang-switcher.open .lang-dropdown { display: block; }
+    .lang-opt {
+      width: 100%; display: flex; align-items: center; gap: 0.625rem;
+      padding: 0.6rem 0.875rem; font-size: 0.875rem; font-weight: 500;
+      border: none; background: transparent; color: var(--fg); cursor: pointer;
+      transition: background 0.15s; text-align: left; font-family: 'DM Sans', sans-serif;
+    }
+    .lang-opt:hover { background: var(--muted); }
+    .lang-opt.active { color: var(--primary); font-weight: 700; }
+    .lang-opt .flag { font-size: 1.05rem; line-height: 1; }
   </style>
 </head>
 <body>
@@ -384,6 +416,18 @@
           <span class="logo-text">Eugeni<span>studio</span></span>
         </a>
         <div class="header-right">
+          <div class="lang-switcher" id="langSwitcher">
+            <button class="lang-toggle" id="langToggle" aria-haspopup="true">
+              <svg class="lt-globe" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
+              <span id="langCurrent">IT</span>
+              <svg class="lt-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+            </button>
+            <div class="lang-dropdown" id="langDropdown">
+              <button class="lang-opt" data-lang="it"><span class="flag">🇮🇹</span> Italiano</button>
+              <button class="lang-opt" data-lang="en"><span class="flag">🇬🇧</span> English</button>
+              <button class="lang-opt" data-lang="es"><span class="flag">🇪🇸</span> Español</button>
+            </div>
+          </div>
           <div class="header-label">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>
             <span>Dashboard</span>
@@ -403,8 +447,8 @@
 
       <!-- Page Header -->
       <div class="page-header fade-in">
-        <h1 class="page-title">Dashboard</h1>
-        <p class="page-desc">Panoramica in tempo reale con orologi, fasi lunari e strumenti tecnici.</p>
+        <h1 class="page-title" data-i18n="pageTitle">Dashboard</h1>
+        <p class="page-desc" data-i18n="pageDesc">Panoramica in tempo reale con orologi, fasi lunari e strumenti tecnici.</p>
       </div>
 
       <!-- World Clocks -->
@@ -414,8 +458,8 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
           </div>
           <div>
-            <h2 class="section-title">Orologi Mondiali</h2>
-            <p class="section-subtitle">Ora locale in tempo reale</p>
+            <h2 class="section-title" data-i18n="worldClocksTitle">Orologi Mondiali</h2>
+            <p class="section-subtitle" data-i18n="worldClocksSubtitle">Ora locale in tempo reale</p>
           </div>
         </div>
         <div class="clocks-grid" id="clocksGrid"></div>
@@ -428,8 +472,8 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
           </div>
           <div>
-            <h2 class="section-title">Fase Lunare</h2>
-            <p class="section-subtitle">Fase lunare corrente e informazioni</p>
+            <h2 class="section-title" data-i18n="moonTitle">Fase Lunare</h2>
+            <p class="section-subtitle" data-i18n="moonSubtitle">Fase lunare corrente e informazioni</p>
           </div>
         </div>
         <div class="card" id="moonCard" style="padding:1.5rem;"></div>
@@ -442,8 +486,8 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
           </div>
           <div>
-            <h2 class="section-title">Strumenti Tecnici</h2>
-            <p class="section-subtitle">Tools di calcolo e conversione</p>
+            <h2 class="section-title" data-i18n="toolsTitle">Strumenti Tecnici</h2>
+            <p class="section-subtitle" data-i18n="toolsSubtitle">Tools di calcolo e conversione</p>
           </div>
         </div>
         <div class="tools-grid" id="toolsGrid"></div>
@@ -458,7 +502,7 @@
       <div class="tl-modal-header">
         <div class="tl-modal-title">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4"/><path d="m16.2 7.8 2.9-2.9"/><path d="M18 12h4"/><path d="m16.2 16.2 2.9 2.9"/><path d="M12 18v4"/><path d="m4.9 19.1 2.9-2.9"/><path d="M2 12h4"/><path d="m4.9 4.9 2.9 2.9"/><circle cx="12" cy="12" r="4"/></svg>
-          Calcolatore Time Lapse
+          <span data-i18n="tlTitle">Calcolatore Time Lapse</span>
         </div>
         <button class="tl-close" id="tlClose" title="Chiudi">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
@@ -467,29 +511,29 @@
 
       <div class="tl-fields">
         <div class="tl-field">
-          <label>Intervallo tra scatti</label>
+          <label data-i18n="tlIntervalLabel">Intervallo tra scatti</label>
           <div class="tl-field-inner">
             <input class="tl-input" type="number" id="tlInterval" value="5" min="0.1" step="0.1">
             <span class="tl-unit">sec</span>
           </div>
         </div>
         <div class="tl-field">
-          <label>Durata registrazione</label>
+          <label data-i18n="tlDurationLabel">Durata registrazione</label>
           <div class="tl-field-inner">
             <input class="tl-input" type="number" id="tlDuration" value="60" min="1" step="1">
             <span class="tl-unit" id="tlDurUnit">min</span>
           </div>
         </div>
         <div class="tl-field">
-          <label>Unità durata</label>
+          <label data-i18n="tlUnitLabel">Unità durata</label>
           <select class="tl-select" id="tlDurUnit2">
-            <option value="60">Minuti</option>
-            <option value="3600">Ore</option>
-            <option value="1">Secondi</option>
+            <option value="60" data-i18n="tlUnitMin">Minuti</option>
+            <option value="3600" data-i18n="tlUnitHours">Ore</option>
+            <option value="1" data-i18n="tlUnitSec">Secondi</option>
           </select>
         </div>
         <div class="tl-field">
-          <label>Frame rate output</label>
+          <label data-i18n="tlFpsLabel">Frame rate output</label>
           <select class="tl-select" id="tlFps">
             <option value="30" selected>30 fps</option>
             <option value="24">24 fps</option>
@@ -502,7 +546,7 @@
       <hr class="tl-divider">
 
       <div class="tl-result">
-        <div class="tl-result-label">⏱ Durata video finale</div>
+        <div class="tl-result-label" data-i18n="tlResultLabel">⏱ Durata video finale</div>
         <div class="tl-result-main" id="tlResultMain">--</div>
         <div class="tl-result-sub" id="tlResultSub"></div>
       </div>
@@ -510,15 +554,15 @@
       <div class="tl-stats">
         <div class="tl-stat">
           <div class="tl-stat-val" id="tlStatFrames">--</div>
-          <div class="tl-stat-lbl">Fotogrammi totali</div>
+          <div class="tl-stat-lbl" data-i18n="tlStatFrames">Fotogrammi totali</div>
         </div>
         <div class="tl-stat">
           <div class="tl-stat-val" id="tlStatSpeed">--×</div>
-          <div class="tl-stat-lbl">Velocità accelerazione</div>
+          <div class="tl-stat-lbl" data-i18n="tlStatSpeed">Velocità accelerazione</div>
         </div>
         <div class="tl-stat">
           <div class="tl-stat-val" id="tlStatRec">--</div>
-          <div class="tl-stat-lbl">Tempo reale ripreso</div>
+          <div class="tl-stat-lbl" data-i18n="tlStatRec">Tempo reale ripreso</div>
         </div>
       </div>
     </div>
@@ -530,7 +574,7 @@
       <div class="hum-modal-header">
         <div class="hum-modal-title">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
-          Calcolo Umidità Ingredienti
+          <span data-i18n="humTitle">Calcolo Umidità Ingredienti</span>
         </div>
         <button class="hum-close" id="humClose" title="Chiudi">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
@@ -538,9 +582,9 @@
       </div>
 
       <div class="hum-row-header">
-        <span class="hum-col-label">Ingrediente</span>
-        <span class="hum-col-label" style="text-align:right">Peso (g)</span>
-        <span class="hum-col-label" style="text-align:right">Umidità (%)</span>
+        <span class="hum-col-label" data-i18n="humColIngredient">Ingrediente</span>
+        <span class="hum-col-label" style="text-align:right" data-i18n="humColWeight">Peso (g)</span>
+        <span class="hum-col-label" style="text-align:right" data-i18n="humColHumidity">Umidità (%)</span>
       </div>
 
       <div class="hum-ingredients" id="humIngredients">
@@ -551,23 +595,23 @@
 
       <div class="hum-results">
         <div class="hum-result-card">
-          <div class="hum-result-label">💧 Umidità media pesata</div>
+          <div class="hum-result-label" data-i18n="humLabelAvg">💧 Umidità media pesata</div>
           <div class="hum-result-main" id="humResultPct">—</div>
-          <div class="hum-result-sub" id="humResultPctSub">Inserisci almeno un ingrediente</div>
+          <div class="hum-result-sub" id="humResultPctSub" data-i18n="humInitSubPct">Inserisci almeno un ingrediente</div>
           <div class="hum-bar-wrap">
             <div class="hum-bar-label"><span>0%</span><span>100%</span></div>
             <div class="hum-bar-track"><div class="hum-bar-fill" id="humBar" style="width:0%"></div></div>
           </div>
         </div>
         <div class="hum-result-card">
-          <div class="hum-result-label">⚖️ Peso totale ricetta</div>
+          <div class="hum-result-label" data-i18n="humLabelWeight">⚖️ Peso totale ricetta</div>
           <div class="hum-result-main" id="humResultWeight">—</div>
-          <div class="hum-result-sub" id="humResultWeightSub">Somma di tutti gli ingredienti</div>
+          <div class="hum-result-sub" id="humResultWeightSub" data-i18n="humInitSubWeight">Somma di tutti gli ingredienti</div>
         </div>
         <div class="hum-result-card">
-          <div class="hum-result-label">🚿 Acqua totale</div>
+          <div class="hum-result-label" data-i18n="humLabelWater">🚿 Acqua totale</div>
           <div class="hum-result-main" id="humResultWater">—</div>
-          <div class="hum-result-sub" id="humResultWaterSub">Acqua contenuta negli ingredienti</div>
+          <div class="hum-result-sub" id="humResultWaterSub" data-i18n="humInitSubWater">Acqua contenuta negli ingredienti</div>
         </div>
       </div>
     </div>
@@ -584,6 +628,146 @@
   </footer>
 
   <script>
+    // ==== TRANSLATIONS ====
+    const TRANSLATIONS = {
+      it: {
+        pageTitle: 'Dashboard', pageDesc: 'Panoramica in tempo reale con orologi, fasi lunari e strumenti tecnici.',
+        worldClocksTitle: 'Orologi Mondiali', worldClocksSubtitle: 'Ora locale in tempo reale',
+        moonTitle: 'Fase Lunare', moonSubtitle: 'Fase lunare corrente e informazioni',
+        toolsTitle: 'Strumenti Tecnici', toolsSubtitle: 'Tools di calcolo e conversione',
+        moonIllumination: 'Illuminazione', moonAge: 'Età Lunare',
+        moonNextFull: 'Prossima Luna Piena', moonNextNew: 'Prossima Luna Nuova',
+        moonPhase: 'Fase', moonCycle: 'Ciclo Lunare',
+        moonInDays: 'tra {n} giorni', moonAgeDays: '{n} giorni', moonCycleDays: '29.5 giorni',
+        moonNew: 'Luna Nuova', moonWaxingCrescent: 'Crescente', moonFirstQuarter: 'Primo Quarto',
+        moonWaxingGibbous: 'Gibbosa Crescente', moonFull: 'Luna Piena',
+        moonWaningGibbous: 'Gibbosa Calante', moonLastQuarter: 'Ultimo Quarto', moonWaningCrescent: 'Calante',
+        toolTimeLapseName: 'Time Lapse', toolTimeLapseDesc: 'Calcola la durata del video finale in base a intervallo, durata ripresa e fps.',
+        toolHumidityName: 'Calcolo Umidità', toolHumidityDesc: 'Media pesata dell\'umidità per fino a 4 ingredienti: inserisci peso e umidità dichiarata per ottenere l\'umidità finale e il peso totale della ricetta.',
+        toolAnalysisName: 'Analisi Dati', toolAnalysisDesc: 'Strumenti di analisi statistica e visualizzazione.',
+        toolLinearAlgName: 'Algebra Lineare', toolLinearAlgDesc: 'Matrici, determinanti, sistemi di equazioni.',
+        toolGeomName: 'Geometria', toolGeomDesc: 'Calcolo aree, volumi, perimetri e proprietà geometriche.',
+        toolBaseConvName: 'Conversione Basi', toolBaseConvDesc: 'Conversione tra basi numeriche: binario, ottale, esadecimale.',
+        toolPctName: 'Calcolo Percentuali', toolPctDesc: 'Percentuali, incrementi, ricarichi e sconti.',
+        toolChemName: 'Formule Chimiche', toolChemDesc: 'Calcolo masse molari e bilanciamento equazioni.',
+        badgeActive: 'Attivo', badgeComingSoon: 'Coming Soon',
+        tlTitle: 'Calcolatore Time Lapse', tlIntervalLabel: 'Intervallo tra scatti',
+        tlDurationLabel: 'Durata registrazione', tlUnitLabel: 'Unità durata', tlFpsLabel: 'Frame rate output',
+        tlUnitMin: 'Minuti', tlUnitHours: 'Ore', tlUnitSec: 'Secondi',
+        tlResultLabel: '⏱ Durata video finale', tlStatFrames: 'Fotogrammi totali',
+        tlStatSpeed: 'Velocità accelerazione', tlStatRec: 'Tempo reale ripreso', tlInvalidInput: 'Inserisci valori validi',
+        humTitle: 'Calcolo Umidità Ingredienti', humColIngredient: 'Ingrediente',
+        humColWeight: 'Peso (g)', humColHumidity: 'Umidità (%)', humIngredientPlaceholder: 'Ingrediente {n}',
+        humLabelAvg: '💧 Umidità media pesata', humLabelWeight: '⚖️ Peso totale ricetta', humLabelWater: '🚿 Acqua totale',
+        humInitSubPct: 'Inserisci almeno un ingrediente', humInitSubWeight: 'Somma di tutti gli ingredienti',
+        humInitSubWater: 'Acqua contenuta negli ingredienti',
+        humSubPct: 'Media pesata su {w} g', humSubWater: '{pct}% di {w} g',
+      },
+      en: {
+        pageTitle: 'Dashboard', pageDesc: 'Real-time overview with world clocks, moon phases and technical tools.',
+        worldClocksTitle: 'World Clocks', worldClocksSubtitle: 'Local time in real time',
+        moonTitle: 'Moon Phase', moonSubtitle: 'Current moon phase and information',
+        toolsTitle: 'Technical Tools', toolsSubtitle: 'Calculation and conversion tools',
+        moonIllumination: 'Illumination', moonAge: 'Moon Age',
+        moonNextFull: 'Next Full Moon', moonNextNew: 'Next New Moon',
+        moonPhase: 'Phase', moonCycle: 'Lunar Cycle',
+        moonInDays: 'in {n} days', moonAgeDays: '{n} days', moonCycleDays: '29.5 days',
+        moonNew: 'New Moon', moonWaxingCrescent: 'Waxing Crescent', moonFirstQuarter: 'First Quarter',
+        moonWaxingGibbous: 'Waxing Gibbous', moonFull: 'Full Moon',
+        moonWaningGibbous: 'Waning Gibbous', moonLastQuarter: 'Last Quarter', moonWaningCrescent: 'Waning Crescent',
+        toolTimeLapseName: 'Time Lapse', toolTimeLapseDesc: 'Calculate the final video duration based on interval, recording duration and fps.',
+        toolHumidityName: 'Humidity Calc', toolHumidityDesc: 'Weighted average humidity for up to 4 ingredients: enter weight and declared humidity to get the final humidity and total recipe weight.',
+        toolAnalysisName: 'Data Analysis', toolAnalysisDesc: 'Statistical analysis and visualization tools.',
+        toolLinearAlgName: 'Linear Algebra', toolLinearAlgDesc: 'Matrices, determinants, systems of equations.',
+        toolGeomName: 'Geometry', toolGeomDesc: 'Calculate areas, volumes, perimeters and geometric properties.',
+        toolBaseConvName: 'Base Conversion', toolBaseConvDesc: 'Convert between number bases: binary, octal, hexadecimal.',
+        toolPctName: 'Percentage Calc', toolPctDesc: 'Percentages, increments, markups and discounts.',
+        toolChemName: 'Chemical Formulas', toolChemDesc: 'Molar mass calculations and equation balancing.',
+        badgeActive: 'Active', badgeComingSoon: 'Coming Soon',
+        tlTitle: 'Time Lapse Calculator', tlIntervalLabel: 'Interval between shots',
+        tlDurationLabel: 'Recording duration', tlUnitLabel: 'Duration unit', tlFpsLabel: 'Output frame rate',
+        tlUnitMin: 'Minutes', tlUnitHours: 'Hours', tlUnitSec: 'Seconds',
+        tlResultLabel: '⏱ Final video duration', tlStatFrames: 'Total frames',
+        tlStatSpeed: 'Acceleration speed', tlStatRec: 'Real time recorded', tlInvalidInput: 'Enter valid values',
+        humTitle: 'Ingredient Humidity Calculator', humColIngredient: 'Ingredient',
+        humColWeight: 'Weight (g)', humColHumidity: 'Humidity (%)', humIngredientPlaceholder: 'Ingredient {n}',
+        humLabelAvg: '💧 Weighted avg. humidity', humLabelWeight: '⚖️ Total recipe weight', humLabelWater: '🚿 Total water',
+        humInitSubPct: 'Enter at least one ingredient', humInitSubWeight: 'Sum of all ingredients',
+        humInitSubWater: 'Water contained in ingredients',
+        humSubPct: 'Weighted avg. over {w} g', humSubWater: '{pct}% of {w} g',
+      },
+      es: {
+        pageTitle: 'Panel de Control', pageDesc: 'Vista en tiempo real con relojes mundiales, fases lunares y herramientas técnicas.',
+        worldClocksTitle: 'Relojes Mundiales', worldClocksSubtitle: 'Hora local en tiempo real',
+        moonTitle: 'Fase Lunar', moonSubtitle: 'Fase lunar actual e información',
+        toolsTitle: 'Herramientas Técnicas', toolsSubtitle: 'Herramientas de cálculo y conversión',
+        moonIllumination: 'Iluminación', moonAge: 'Edad Lunar',
+        moonNextFull: 'Próxima Luna Llena', moonNextNew: 'Próxima Luna Nueva',
+        moonPhase: 'Fase', moonCycle: 'Ciclo Lunar',
+        moonInDays: 'en {n} días', moonAgeDays: '{n} días', moonCycleDays: '29.5 días',
+        moonNew: 'Luna Nueva', moonWaxingCrescent: 'Creciente', moonFirstQuarter: 'Cuarto Creciente',
+        moonWaxingGibbous: 'Gibosa Creciente', moonFull: 'Luna Llena',
+        moonWaningGibbous: 'Gibosa Menguante', moonLastQuarter: 'Cuarto Menguante', moonWaningCrescent: 'Menguante',
+        toolTimeLapseName: 'Time Lapse', toolTimeLapseDesc: 'Calcula la duración del vídeo final según el intervalo, duración de grabación y fps.',
+        toolHumidityName: 'Cálculo Humedad', toolHumidityDesc: 'Media ponderada de humedad para hasta 4 ingredientes: introduce peso y humedad declarada para obtener la humedad final y el peso total de la receta.',
+        toolAnalysisName: 'Análisis de Datos', toolAnalysisDesc: 'Herramientas de análisis estadístico y visualización.',
+        toolLinearAlgName: 'Álgebra Lineal', toolLinearAlgDesc: 'Matrices, determinantes, sistemas de ecuaciones.',
+        toolGeomName: 'Geometría', toolGeomDesc: 'Cálculo de áreas, volúmenes, perímetros y propiedades geométricas.',
+        toolBaseConvName: 'Conversión de Bases', toolBaseConvDesc: 'Conversión entre bases numéricas: binario, octal, hexadecimal.',
+        toolPctName: 'Cálculo Porcentajes', toolPctDesc: 'Porcentajes, incrementos, recargos y descuentos.',
+        toolChemName: 'Fórmulas Químicas', toolChemDesc: 'Cálculo de masas molares y equilibrado de ecuaciones.',
+        badgeActive: 'Activo', badgeComingSoon: 'Próximamente',
+        tlTitle: 'Calculadora Time Lapse', tlIntervalLabel: 'Intervalo entre tomas',
+        tlDurationLabel: 'Duración de grabación', tlUnitLabel: 'Unidad de duración', tlFpsLabel: 'Vel. de fotogramas',
+        tlUnitMin: 'Minutos', tlUnitHours: 'Horas', tlUnitSec: 'Segundos',
+        tlResultLabel: '⏱ Duración del vídeo final', tlStatFrames: 'Fotogramas totales',
+        tlStatSpeed: 'Vel. de aceleración', tlStatRec: 'Tiempo real grabado', tlInvalidInput: 'Introduce valores válidos',
+        humTitle: 'Calculadora de Humedad de Ingredientes', humColIngredient: 'Ingrediente',
+        humColWeight: 'Peso (g)', humColHumidity: 'Humedad (%)', humIngredientPlaceholder: 'Ingrediente {n}',
+        humLabelAvg: '💧 Humedad media ponderada', humLabelWeight: '⚖️ Peso total receta', humLabelWater: '🚿 Agua total',
+        humInitSubPct: 'Introduce al menos un ingrediente', humInitSubWeight: 'Suma de todos los ingredientes',
+        humInitSubWater: 'Agua contenida en los ingredientes',
+        humSubPct: 'Media ponderada sobre {w} g', humSubWater: '{pct}% de {w} g',
+      }
+    };
+
+    let currentLang = localStorage.getItem('lang') || 'it';
+
+    function t(key, vars) {
+      const str = (TRANSLATIONS[currentLang] && TRANSLATIONS[currentLang][key])
+                  || (TRANSLATIONS['it'] && TRANSLATIONS['it'][key]) || key;
+      if (!vars) return str;
+      return str.replace(/\{(\w+)\}/g, (_, k) => vars[k] !== undefined ? vars[k] : '');
+    }
+
+    const LANG_LABELS = { it: 'IT', en: 'EN', es: 'ES' };
+
+    function applyTranslations() {
+      document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });
+      document.querySelectorAll('.lang-opt').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.lang === currentLang);
+      });
+      document.getElementById('langCurrent').textContent = LANG_LABELS[currentLang] || 'IT';
+      const titles = { it: 'Dashboard Tecnica', en: 'Technical Dashboard', es: 'Panel Técnico' };
+      document.title = 'Eugenistudio - ' + (titles[currentLang] || titles.it);
+    }
+
+    function setLanguage(lang) {
+      currentLang = lang;
+      localStorage.setItem('lang', lang);
+      applyTranslations();
+      renderMoon();
+      renderTools();
+      const humContainer = document.getElementById('humIngredients');
+      if (humContainer.children.length > 0) {
+        humContainer.querySelectorAll('.hum-row').forEach((row, i) => {
+          row.querySelector('.hum-input-name').placeholder = t('humIngredientPlaceholder', { n: i + 1 });
+        });
+        calcHumidity();
+      }
+      calcTimeLapse();
+    }
+
     // ==== THEME TOGGLE ====
     const themeToggle = document.getElementById('themeToggle');
     const sunIcon = document.getElementById('sunIcon');
@@ -608,12 +792,12 @@
 
     // ==== CITIES DATA ====
     const CITIES = [
-      { city: 'Roma', timezone: 'Europe/Rome', country: 'Italia', emoji: '\u{1F1EE}\u{1F1F9}' },
-      { city: 'Londra', timezone: 'Europe/London', country: 'Regno Unito', emoji: '\u{1F1EC}\u{1F1E7}' },
-      { city: 'New York', timezone: 'America/New_York', country: 'USA', emoji: '\u{1F1FA}\u{1F1F8}' },
-      { city: 'Shanghai', timezone: 'Asia/Shanghai', country: 'Cina', emoji: '\u{1F1E8}\u{1F1F3}' },
-      { city: 'Jakarta', timezone: 'Asia/Jakarta', country: 'Indonesia', emoji: '\u{1F1EE}\u{1F1E9}' },
-      { city: 'Buenos Aires', timezone: 'America/Argentina/Buenos_Aires', country: 'Argentina', emoji: '\u{1F1E6}\u{1F1F7}' },
+      { it: 'Roma',         en: 'Rome',         es: 'Roma',          timezone: 'Europe/Rome',                        cIt: 'Italia',      cEn: 'Italy',          cEs: 'Italia',      emoji: '\u{1F1EE}\u{1F1F9}' },
+      { it: 'Londra',       en: 'London',        es: 'Londres',       timezone: 'Europe/London',                      cIt: 'Regno Unito', cEn: 'United Kingdom', cEs: 'Reino Unido', emoji: '\u{1F1EC}\u{1F1E7}' },
+      { it: 'New York',     en: 'New York',      es: 'Nueva York',    timezone: 'America/New_York',                   cIt: 'USA',         cEn: 'USA',            cEs: 'EE.UU.',      emoji: '\u{1F1FA}\u{1F1F8}' },
+      { it: 'Shanghai',     en: 'Shanghai',      es: 'Shanghái',      timezone: 'Asia/Shanghai',                      cIt: 'Cina',        cEn: 'China',          cEs: 'China',       emoji: '\u{1F1E8}\u{1F1F3}' },
+      { it: 'Jakarta',      en: 'Jakarta',       es: 'Yakarta',       timezone: 'Asia/Jakarta',                       cIt: 'Indonesia',   cEn: 'Indonesia',      cEs: 'Indonesia',   emoji: '\u{1F1EE}\u{1F1E9}' },
+      { it: 'Buenos Aires', en: 'Buenos Aires',  es: 'Buenos Aires',  timezone: 'America/Argentina/Buenos_Aires',     cIt: 'Argentina',   cEn: 'Argentina',      cEs: 'Argentina',   emoji: '\u{1F1E6}\u{1F1F7}' },
     ];
 
     // ==== WORLD CLOCKS ====
@@ -623,8 +807,9 @@
       } catch { return '--:--:--'; }
     }
     function formatDate(date, tz) {
+      const locale = currentLang === 'en' ? 'en-GB' : currentLang === 'es' ? 'es-ES' : 'it-IT';
       try {
-        return date.toLocaleDateString('it-IT', { timeZone: tz, weekday: 'short', day: 'numeric', month: 'short' });
+        return date.toLocaleDateString(locale, { timeZone: tz, weekday: 'short', day: 'numeric', month: 'short' });
       } catch { return ''; }
     }
     function getUtcOffset(date, tz) {
@@ -673,13 +858,15 @@
       const now = new Date();
       const grid = document.getElementById('clocksGrid');
       grid.innerHTML = CITIES.map(c => {
-        const t = getTimeParts(now, c.timezone);
+        const tp = getTimeParts(now, c.timezone);
+        const cityName    = c[currentLang] || c.it;
+        const countryName = currentLang === 'en' ? c.cEn : currentLang === 'es' ? c.cEs : c.cIt;
         return `<div class="card card-interactive clock-card">
           <div class="clock-emoji">${c.emoji}</div>
-          ${drawClockSVG(t.hours, t.minutes, t.seconds)}
+          ${drawClockSVG(tp.hours, tp.minutes, tp.seconds)}
           <div class="clock-time">${formatTime(now, c.timezone)}</div>
-          <div class="clock-city">${c.city}</div>
-          <div class="clock-country">${c.country}</div>
+          <div class="clock-city">${cityName}</div>
+          <div class="clock-country">${countryName}</div>
           <div class="clock-date">${formatDate(now, c.timezone)} &middot; ${getUtcOffset(now, c.timezone)}</div>
         </div>`;
       }).join('');
@@ -715,20 +902,20 @@
       const age = phase * SYNODIC_MONTH;
       const illumination = (1 - Math.cos(phase * 2 * Math.PI)) / 2;
 
-      let phaseName, emoji;
-      if (phase < 0.0339 || phase >= 0.9661) { phaseName = 'Luna Nuova';        emoji = '\u{1F311}'; }
-      else if (phase < 0.25 - 0.0339)        { phaseName = 'Crescente';         emoji = '\u{1F312}'; }
-      else if (phase < 0.25 + 0.0339)        { phaseName = 'Primo Quarto';      emoji = '\u{1F313}'; }
-      else if (phase < 0.5  - 0.0339)        { phaseName = 'Gibbosa Crescente'; emoji = '\u{1F314}'; }
-      else if (phase < 0.5  + 0.0339)        { phaseName = 'Luna Piena';        emoji = '\u{1F315}'; }
-      else if (phase < 0.75 - 0.0339)        { phaseName = 'Gibbosa Calante';   emoji = '\u{1F316}'; }
-      else if (phase < 0.75 + 0.0339)        { phaseName = 'Ultimo Quarto';     emoji = '\u{1F317}'; }
-      else                                    { phaseName = 'Calante';           emoji = '\u{1F318}'; }
+      let phaseKey, emoji;
+      if (phase < 0.0339 || phase >= 0.9661) { phaseKey = 'moonNew';            emoji = '\u{1F311}'; }
+      else if (phase < 0.25 - 0.0339)        { phaseKey = 'moonWaxingCrescent'; emoji = '\u{1F312}'; }
+      else if (phase < 0.25 + 0.0339)        { phaseKey = 'moonFirstQuarter';   emoji = '\u{1F313}'; }
+      else if (phase < 0.5  - 0.0339)        { phaseKey = 'moonWaxingGibbous';  emoji = '\u{1F314}'; }
+      else if (phase < 0.5  + 0.0339)        { phaseKey = 'moonFull';           emoji = '\u{1F315}'; }
+      else if (phase < 0.75 - 0.0339)        { phaseKey = 'moonWaningGibbous';  emoji = '\u{1F316}'; }
+      else if (phase < 0.75 + 0.0339)        { phaseKey = 'moonLastQuarter';    emoji = '\u{1F317}'; }
+      else                                    { phaseKey = 'moonWaningCrescent'; emoji = '\u{1F318}'; }
 
       const daysUntilFull = phase < 0.5 ? (0.5 - phase) * SYNODIC_MONTH : (1.5 - phase) * SYNODIC_MONTH;
       const daysUntilNew  = (1 - phase) * SYNODIC_MONTH;
 
-      return { phase, illumination: Math.round(illumination * 100), phaseName, emoji,
+      return { phase, illumination: Math.round(illumination * 100), phaseKey, emoji,
                daysUntilFull: Math.round(daysUntilFull), daysUntilNew: Math.round(daysUntilNew),
                age: Math.round(age * 10) / 10 };
     }
@@ -770,51 +957,51 @@
         <div class="moon-visual">
           ${drawMoonSVG(data.phase, data.illumination)}
           <div class="moon-emoji">${data.emoji}</div>
-          <h3 class="moon-name">${data.phaseName}</h3>
+          <h3 class="moon-name">${t(data.phaseKey)}</h3>
         </div>
         <div class="moon-info-grid">
-          <div class="info-card"><div class="info-card-header">${sunSvg}<span class="info-card-label">Illuminazione</span></div><div class="info-card-value">${data.illumination}%</div></div>
-          <div class="info-card"><div class="info-card-header">${moonSvg}<span class="info-card-label">Et\u00e0 Lunare</span></div><div class="info-card-value">${data.age} giorni</div></div>
-          <div class="info-card"><div class="info-card-header">${calSvg}<span class="info-card-label">Prossima Luna Piena</span></div><div class="info-card-value">tra ${data.daysUntilFull} giorni</div></div>
-          <div class="info-card"><div class="info-card-header">${calMuted}<span class="info-card-label">Prossima Luna Nuova</span></div><div class="info-card-value">tra ${data.daysUntilNew} giorni</div></div>
-          <div class="info-card"><div class="info-card-header">${moonMuted}<span class="info-card-label">Fase</span></div><div class="info-card-value">${Math.round(data.phase * 100)}%</div></div>
-          <div class="info-card"><div class="info-card-header">${globeSvg}<span class="info-card-label">Ciclo Lunare</span></div><div class="info-card-value">29.5 giorni</div></div>
+          <div class="info-card"><div class="info-card-header">${sunSvg}<span class="info-card-label">${t('moonIllumination')}</span></div><div class="info-card-value">${data.illumination}%</div></div>
+          <div class="info-card"><div class="info-card-header">${moonSvg}<span class="info-card-label">${t('moonAge')}</span></div><div class="info-card-value">${t('moonAgeDays', { n: data.age })}</div></div>
+          <div class="info-card"><div class="info-card-header">${calSvg}<span class="info-card-label">${t('moonNextFull')}</span></div><div class="info-card-value">${t('moonInDays', { n: data.daysUntilFull })}</div></div>
+          <div class="info-card"><div class="info-card-header">${calMuted}<span class="info-card-label">${t('moonNextNew')}</span></div><div class="info-card-value">${t('moonInDays', { n: data.daysUntilNew })}</div></div>
+          <div class="info-card"><div class="info-card-header">${moonMuted}<span class="info-card-label">${t('moonPhase')}</span></div><div class="info-card-value">${Math.round(data.phase * 100)}%</div></div>
+          <div class="info-card"><div class="info-card-header">${globeSvg}<span class="info-card-label">${t('moonCycle')}</span></div><div class="info-card-value">${t('moonCycleDays')}</div></div>
         </div>
       </div>`;
     }
     renderMoon();
 
     // ==== TOOLS GRID ====
-    const TOOLS = [
-      { name: 'Time Lapse', desc: 'Calcola la durata del video finale in base a intervallo, durata ripresa e fps.', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4"/><path d="m16.2 7.8 2.9-2.9"/><path d="M18 12h4"/><path d="m16.2 16.2 2.9 2.9"/><path d="M12 18v4"/><path d="m4.9 19.1 2.9-2.9"/><path d="M2 12h4"/><path d="m4.9 4.9 2.9 2.9"/><circle cx="12" cy="12" r="4"/></svg>', active: true },
-      { name: 'Calcolo Umidit\u00e0', desc: 'Media pesata dell\u2019umidit\u00e0 per fino a 5 ingredienti: inserisci peso e umidit\u00e0 dichiarata per ottenere l\u2019umidit\u00e0 finale e il peso totale della ricetta.', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>', active: true, modal: 'humOverlay' },
-      { name: 'Analisi Dati', desc: 'Strumenti di analisi statistica e visualizzazione.', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>' },
-      { name: 'Algebra Lineare', desc: 'Matrici, determinanti, sistemi di equazioni.', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 7V4H6l6 8-6 8h12v-3"/></svg>' },
-      { name: 'Geometria', desc: 'Calcolo aree, volumi, perimetri e propriet\u00e0 geometriche.', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z"/><path d="m14.5 12.5 2-2"/></svg>' },
-      { name: 'Conversione Basi', desc: 'Conversione tra basi numeriche: binario, ottale, esadecimale.', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="14" y="14" width="4" height="6" rx="2"/><rect x="6" y="4" width="4" height="6" rx="2"/><path d="M6 20h4"/><path d="M14 10h4"/><path d="M6 14h2v6"/><path d="M14 4h2v6"/></svg>' },
-      { name: 'Calcolo Percentuali', desc: 'Percentuali, incrementi, ricarichi e sconti.', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" x2="5" y1="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>' },
-      { name: 'Formule Chimiche', desc: 'Calcolo masse molari e bilanciamento equazioni.', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2v7.527a2 2 0 0 1-.211.896L4.72 20.55a1 1 0 0 0 .9 1.45h12.76a1 1 0 0 0 .9-1.45l-5.069-10.127A2 2 0 0 1 14 9.527V2"/><path d="M8.5 2h7"/><path d="M7 16h10"/></svg>' },
+    const TOOLS_DATA = [
+      { nk: 'toolTimeLapseName', dk: 'toolTimeLapseDesc', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4"/><path d="m16.2 7.8 2.9-2.9"/><path d="M18 12h4"/><path d="m16.2 16.2 2.9 2.9"/><path d="M12 18v4"/><path d="m4.9 19.1 2.9-2.9"/><path d="M2 12h4"/><path d="m4.9 4.9 2.9 2.9"/><circle cx="12" cy="12" r="4"/></svg>', active: true },
+      { nk: 'toolHumidityName', dk: 'toolHumidityDesc', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>', active: true, modal: 'humOverlay' },
+      { nk: 'toolAnalysisName', dk: 'toolAnalysisDesc', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>' },
+      { nk: 'toolLinearAlgName', dk: 'toolLinearAlgDesc', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 7V4H6l6 8-6 8h12v-3"/></svg>' },
+      { nk: 'toolGeomName', dk: 'toolGeomDesc', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z"/><path d="m14.5 12.5 2-2"/></svg>' },
+      { nk: 'toolBaseConvName', dk: 'toolBaseConvDesc', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="14" y="14" width="4" height="6" rx="2"/><rect x="6" y="4" width="4" height="6" rx="2"/><path d="M6 20h4"/><path d="M14 10h4"/><path d="M6 14h2v6"/><path d="M14 4h2v6"/></svg>' },
+      { nk: 'toolPctName', dk: 'toolPctDesc', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" x2="5" y1="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>' },
+      { nk: 'toolChemName', dk: 'toolChemDesc', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2v7.527a2 2 0 0 1-.211.896L4.72 20.55a1 1 0 0 0 .9 1.45h12.76a1 1 0 0 0 .9-1.45l-5.069-10.127A2 2 0 0 1 14 9.527V2"/><path d="M8.5 2h7"/><path d="M7 16h10"/></svg>' },
     ];
 
-    const toolsGrid = document.getElementById('toolsGrid');
-    toolsGrid.innerHTML = TOOLS.map((t, i) => {
-      let onclickAttr = '';
-      if (t.active) {
-        if (t.modal) {
-          onclickAttr = `onclick="document.getElementById('${t.modal}').classList.add('open'); if(typeof initHumidity==='function') initHumidity();"`;
-        } else {
-          onclickAttr = `onclick="document.getElementById('tlOverlay').classList.add('open'); calcTimeLapse();"`;
+    function renderTools() {
+      document.getElementById('toolsGrid').innerHTML = TOOLS_DATA.map(tool => {
+        let onclickAttr = '';
+        if (tool.active) {
+          onclickAttr = tool.modal
+            ? `onclick="document.getElementById('${tool.modal}').classList.add('open'); if(typeof initHumidity==='function') initHumidity();"`
+            : `onclick="document.getElementById('tlOverlay').classList.add('open'); calcTimeLapse();"`;
         }
-      }
-      return `<div class="card ${t.active ? 'tool-card-active' : 'tool-card'}" ${onclickAttr}>
-        <div class="tool-header">
-          <div class="tool-icon">${t.icon}</div>
-          <span class="${t.active ? 'badge-active' : 'badge'}">${t.active ? 'Attivo' : 'Coming Soon'}</span>
-        </div>
-        <div class="tool-name">${t.name}</div>
-        <div class="tool-desc">${t.desc}</div>
-      </div>`;
-    }).join('');
+        return `<div class="card ${tool.active ? 'tool-card-active' : 'tool-card'}" ${onclickAttr}>
+          <div class="tool-header">
+            <div class="tool-icon">${tool.icon}</div>
+            <span class="${tool.active ? 'badge-active' : 'badge'}">${t(tool.active ? 'badgeActive' : 'badgeComingSoon')}</span>
+          </div>
+          <div class="tool-name">${t(tool.nk)}</div>
+          <div class="tool-desc">${t(tool.dk)}</div>
+        </div>`;
+      }).join('');
+    }
+    renderTools();
     // ==== TIME LAPSE CALCULATOR ====
     function calcTimeLapse() {
       const interval = parseFloat(document.getElementById('tlInterval').value) || 5;
@@ -839,7 +1026,7 @@
       document.getElementById('tlResultMain').textContent = totalFrames > 0 ? mainText : '—';
       document.getElementById('tlResultSub').textContent = totalFrames > 0
         ? `${totalFrames.toLocaleString('it-IT')} frame ÷ ${fps} fps = ${videoSeconds.toFixed(2)}s`
-        : 'Inserisci valori validi';
+        : t('tlInvalidInput');
 
       document.getElementById('tlStatFrames').textContent = totalFrames.toLocaleString('it-IT');
       document.getElementById('tlStatSpeed').textContent = Math.round(speedup) + '×';
@@ -867,7 +1054,7 @@
         const row = document.createElement('div');
         row.className = 'hum-row';
         row.innerHTML = `
-          <input class="hum-input-name" type="text" placeholder="Ingrediente ${i + 1}">
+          <input class="hum-input-name" type="text" placeholder="${t('humIngredientPlaceholder', { n: i + 1 })}">
           <input class="hum-input-num" type="number" placeholder="0" min="0" step="any" data-hum-weight>
           <input class="hum-input-num" type="number" placeholder="0" min="0" max="100" step="any" data-hum-pct>`;
         container.appendChild(row);
@@ -892,20 +1079,20 @@
 
       if (totalWeight > 0) {
         document.getElementById('humResultPct').textContent     = avgHumidity.toFixed(1) + '%';
-        document.getElementById('humResultPctSub').textContent  = `Media pesata su ${totalWeight.toLocaleString('it-IT')} g`;
+        document.getElementById('humResultPctSub').textContent  = t('humSubPct', { w: totalWeight.toLocaleString('it-IT') });
         document.getElementById('humBar').style.width           = Math.min(avgHumidity, 100) + '%';
         document.getElementById('humResultWeight').textContent  = totalWeight.toLocaleString('it-IT') + ' g';
-        document.getElementById('humResultWeightSub').textContent = 'Somma di tutti gli ingredienti';
+        document.getElementById('humResultWeightSub').textContent = t('humInitSubWeight');
         document.getElementById('humResultWater').textContent   = totalWater.toFixed(1) + ' g';
-        document.getElementById('humResultWaterSub').textContent = `${avgHumidity.toFixed(1)}% di ${totalWeight.toLocaleString('it-IT')} g`;
+        document.getElementById('humResultWaterSub').textContent = t('humSubWater', { pct: avgHumidity.toFixed(1), w: totalWeight.toLocaleString('it-IT') });
       } else {
         document.getElementById('humResultPct').textContent     = '—';
-        document.getElementById('humResultPctSub').textContent  = 'Inserisci almeno un ingrediente';
+        document.getElementById('humResultPctSub').textContent  = t('humInitSubPct');
         document.getElementById('humBar').style.width           = '0%';
         document.getElementById('humResultWeight').textContent  = '—';
-        document.getElementById('humResultWeightSub').textContent = 'Somma di tutti gli ingredienti';
+        document.getElementById('humResultWeightSub').textContent = t('humInitSubWeight');
         document.getElementById('humResultWater').textContent   = '—';
-        document.getElementById('humResultWaterSub').textContent = 'Acqua contenuta negli ingredienti';
+        document.getElementById('humResultWaterSub').textContent = t('humInitSubWater');
       }
     }
 
@@ -914,6 +1101,26 @@
     document.getElementById('humOverlay').addEventListener('click', e => {
       if (e.target === e.currentTarget) e.currentTarget.classList.remove('open');
     });
+
+    // ==== LANGUAGE SWITCHER ====
+    const langSwitcher = document.getElementById('langSwitcher');
+    const langToggle   = document.getElementById('langToggle');
+
+    langToggle.addEventListener('click', e => {
+      e.stopPropagation();
+      langSwitcher.classList.toggle('open');
+    });
+
+    document.addEventListener('click', () => langSwitcher.classList.remove('open'));
+
+    document.querySelectorAll('.lang-opt').forEach(btn => {
+      btn.addEventListener('click', () => {
+        langSwitcher.classList.remove('open');
+        setLanguage(btn.dataset.lang);
+      });
+    });
+
+    applyTranslations();
   </script>
 
 </body>
