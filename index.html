@@ -161,181 +161,58 @@
     .info-card-label { font-size: 0.75rem; color: var(--muted-fg); font-weight: 500; }
     .info-card-value { font-family: 'JetBrains Mono', monospace; font-size: 0.875rem; font-weight: 700; }
 
-        <!-- SEZIONE METEO "EUGENISTUDIO" -->
-    <div id="weather-widget-container">
-        <div class="widget-header">
-            <h3>Meteo</h3>
-            <select id="city-select" style="padding: 5px; border-radius: 4px;">
-                <option value="" disabled selected>-- Seleziona Città --</option>
-            </select>
-        </div>
-        <div id="weather-data-placeholder" class="placeholder-content">
-            <!-- Placeholder visibile finché non ci sono dati -->
-        </div>
-        
-        <div id="weather-details-grid" style="display: none;">
-            <!-- Card Oggi -->
-            <div class="weather-card today-card">
-                <h4>Oggi</h4>
-                <div class="stat-item"><span>Max:</span> <b id="today-max-temp">--°C</b></div>
-                <div class="stat-item"><span>Min:</span> <b id="today-min-temp">--°C</b></div>
-                <div class="stat-item"><span>Umidità:</span> <b id="today-humidity">--%</b></div>
-                <div class="stat-item"><span>Precipitazioni:</span> <b id="today-rain">0mm</b></div>
-            </div>
+     /* Stili Sezione Meteo */
+#weather-widget-container {
+    border-radius: 12px;
+    padding: 15px;
+    margin-top: 15px; /* Spaziatura rispetto alla fase lunare */
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
 
-            <!-- Card Domani -->
-            <div class="weather-card tomorrow-card">
-                <h4>Domani</h4>
-                <div class="stat-item"><span>Max:</span> <b id="tomorrow-max-temp">--°C</b></div>
-                <div class="stat-item"><span>Min:</span> <b id="tomorrow-min-temp">--°C</b></div>
-                <div class="stat-item"><span>Umidità:</span> <b id="tomorrow-humidity">--%</b></div>
-                <div class="stat-item"><span>Precipitazioni:</span> <b id="tomorrow-rain">0mm</b></div>
-            </div>
-        </div>
-    </div>
+.widget-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
 
-    <!-- LOGICA INIZIALIZZATA A DOMContentLoaded -->
-    <script>
-        (function() {
-            // --- CONFIGURAZIONE API METEO ---
-            const WEATHER_API_URL = "https://api.open-meteo.com/v1/forecast?daily=temperature_2m_max,temperature_2m_min,precipitation_sum&hourly=relative_humidity_2m,windspeed_10m,is_day&timezone=Europe%2FBerlin";
-            const GEOCODING_API_URL = "https://geocoding-api.open-meteo.com/v1/search?name=";
+.widget-header h3 {
+    font-size: 1.1em;
+    margin: 0;
+    color: inherit; /* Erede colore testo */
+}
 
-            // --- CAPOLUOGHI REGIONI ITALIANE ---
-            const italianCapitals = [
-                { name: "Aosta", region: "Valle d'Aosta" }, { name: "Torino", region: "Piemonte" },
-                { name: "Novara", region: "Piemonte" }, { name: "Milano", region: "Lombardia" },
-                { name: "Venezia", region: "Veneto" }, { name: "Padova", region: "Veneto" },
-                { name: "Bologna", region: "Emilia-Romagna" }, { name: "Parma", region: "Emilia-Romagna" },
-                { name: "Verona", region: "Veneto" }, { name: "Roma", region: "Lazio" },
-                { name: "Latina", region: "Lazio" }, { name: "Perugia", region: "Umbria" },
-                { name: "Firenze", region: "Toscana" }, { name: "Pistoia", region: "Toscana" },
-                { name: "Livorno", region: "Toscana" }, { name: "Ancona", region: "Marche" },
-                { name: "Pesaro", region: "Marche" }, { name: "Urbino", region: "Marche" },
-                { name: "Napoli", region: "Campania" }, { name: "Salerno", region: "Campania" },
-                { name: "Palermo", region: "Sicilia" }, { name: "Catania", region: "Sicilia" },
-                { name: "Agrigento", region: "Sicilia" }, { name: "Cagliari", region: "Sardegna" },
-                { name: "Nuoro", region: "Sardegna" }, { name: "Bari", region: "Puglia" },
-                { name: "Lecce", region: "Puglia" }, { name: "Trani", region: "Puglia" },
-                { name: "Catanzaro", region: "Calabria" }, { name: "Potenza", region: "Basilicata" },
-                { name: "L'Aquila", region: "Abruzzo" }, { name: "Chieti", region: "Abruzzo" },
-                { name: "Campobasso", region: "Molise" }, { name: "Trieste", region: "Friuli-Venezia Giulia" },
-                { name: "Udine", region: "Friuli-Venezia Giulia" }
-            ];
+.weather-details-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
 
-            // --- TRADUZIONI (Multilingua) ---
-            const translations = {
-                it: { 
-                    maxTemp: "Max", minTemp: "Min", humidity: "Umidità", rain: "Precipitazioni", 
-                    today: "Oggi", tomorrow: "Domani", loading: "Caricamento meteo...", error: "Dati non disponibili"
-                },
-                en: { 
-                    maxTemp: "Max", minTemp: "Min", humidity: "Humidity", rain: "Precipitation", 
-                    today: "Today", tomorrow: "Tomorrow", loading: "Loading weather...", error: "Data not available"
-                },
-                es: { 
-                    maxTemp: "Máx", minTemp: "Mín", humidity: "Humedad", rain: "Lluvia", 
-                    today: "Hoy", tomorrow: "Mañana", loading: "Cargando clima...", error: "Datos no disponibles"
-                }
-            };
+@media (max-width: 600px) {
+    .weather-details-grid {
+        grid-template-columns: 1fr;
+    }
+}
 
-            // --- ELEMENTI DOM ---
-            const selectCity = document.getElementById('city-select');
-            const placeholder = document.getElementById('weather-data-placeholder');
-            const detailsGrid = document.getElementById('weather-details-grid');
+.weather-card {
+    background-color: var(--surface-color, #2d3436); /* Fallback scuro */
+    color: var(--text-color, #fff);
+    padding: 10px;
+    border-radius: 8px;
+}
 
-            // --- POPOLAZIONE MENU A TENDINA ---
-            function populateDropdown() {
-                italianCapitals.forEach(city => {
-                    const option = document.createElement('option');
-                    option.value = city.name;
-                    option.textContent = `${city.region} - ${city.name}`;
-                    selectCity.appendChild(option);
-                });
-                
-                // Event Listeners
-                selectCity.addEventListener('change', (e) => fetchWeatherData(e.target.value));
-            }
+.today-card h4, .tomorrow-card h4 {
+    font-size: 0.9em;
+    opacity: 0.7;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+}
 
-            // --- LOGICA METEO ---
-            async function fetchWeatherData(cityName) {
-                if (!cityName) return;
-
-                try {
-                    const t = getActiveLanguage(); // Recupera la lingua attiva dalla tua dashboard
-                    
-                    // 1. Geocoding: Trovare Lat/Lon per città + IT
-                    const geoResponse = await fetch(`${GEOCODING_API_URL}${cityName}&count=1&language=${t}&format=json`);
-                    const geoData = await geoResponse.json();
-
-                    if (geoData.results && geoData.results.length > 0) {
-                        const lat = geoData.results[0].latitude;
-                        const lon = geoData.results[0].longitude;
-
-                        // 2. Fetch Dati Meteo (Oggi e Domani)
-                        const weatherUrl = `${WEATHER_API_URL}&latitude=${lat}&longitude=${lon}`;
-                        const weatherResponse = await fetch(weatherUrl);
-                        const weatherData = await weatherResponse.json();
-
-                        // 3. Parsing Dati (Assumezione: primo valore daily = Oggi, secondo = Domani)
-                        const todayIndex = 0;
-                        const tomorrowIndex = 1;
-                        
-                        const updateUI = (index) => {
-                            const isMax = index === todayIndex ? document.getElementById('today-max-temp') : document.getElementById('tomorrow-max-temp');
-                            const isMin = index === todayIndex ? document.getElementById('today-min-temp') : document.getElementById('tomorrow-min-temp');
-                            const humidityEl = index === todayIndex ? document.getElementById('today-humidity') : document.getElementById('tomorrow-humidity');
-                            const rainEl = index === todayIndex ? document.getElementById('today-rain') : document.getElementById('tomorrow-rain');
-
-                            isMax.textContent = `${weatherData.daily.temperature_2m_max[index]}°C`;
-                            isMin.textContent = `${weatherData.daily.temperature_2m_min[index]}°C`;
-                            
-                            // Calcolo Umidità Media (ore 09-18 per approssimazione giornaliera)
-                            const h = weatherData.hourly.relative_humidity_2m;
-                            let sumHumidity = 0; 
-                            for(let i=0; i<24; i++) { sumHumidity += h[i]; } // Semplificazione: media semplice per snippet veloce
-                            humidityEl.textContent = `${Math.round(sumHumidity/24)}%`;
-
-                            rainEl.textContent = `${weatherData.daily.precipitation_sum[index]} mm`;
-                        };
-
-                        updateUI(todayIndex);
-                        updateUI(tomorrowIndex);
-
-                        // 4. Mostra Risultati
-                        placeholder.style.display = 'none';
-                        detailsGrid.style.display = 'grid';
-                    } else {
-                        throw new Error("City not found");
-                    }
-                } catch (error) {
-                    console.error("Weather API Error:", error);
-                    placeholder.textContent = translations[it || 'it'].error;
-                    placeholder.style.display = 'block';
-                    detailsGrid.style.display = 'none';
-                }
-            }
-
-            // --- FUNZIONI UTILI ---
-            function getActiveLanguage() {
-                const lang = localStorage.getItem('ui_language'); // Presume esista nella tua dashboard
-                return (lang && ['it','en','es'].includes(lang)) ? lang : 'it';
-            }
-
-            // --- INIZIALIZZAZIONE ---
-            populateDropdown();
-            
-            // Carica dati città default alla fine del caricamento DOM o su prima selezione
-            document.addEventListener('DOMContentLoaded', () => {
-               // Opzionale: Carica automaticamente la prima città dopo un po' di tempo
-               setTimeout(() => {
-                   const firstCity = selectCity.options[selectCity.options.length - 1].value;
-                   if(firstCity) fetchWeatherData(firstCity);
-               }, 500); 
-            });
-
-        })();
-    </script>
+.stat-item span {
+    font-size: 0.8em;
+    display: block;
+    color: var(--accent-color, #ff6b6b); /* Colore di accento */
+}
 
 
     /* Tool card */
@@ -1064,6 +941,183 @@
       const day = date.getDate();
       const hour = date.getUTCHours();
       const min = date.getUTCMinutes();
+
+          <!-- SEZIONE METEO "EUGENISTUDIO" -->
+    <div id="weather-widget-container">
+        <div class="widget-header">
+            <h3>Meteo</h3>
+            <select id="city-select" style="padding: 5px; border-radius: 4px;">
+                <option value="" disabled selected>-- Seleziona Città --</option>
+            </select>
+        </div>
+        <div id="weather-data-placeholder" class="placeholder-content">
+            <!-- Placeholder visibile finché non ci sono dati -->
+        </div>
+        
+        <div id="weather-details-grid" style="display: none;">
+            <!-- Card Oggi -->
+            <div class="weather-card today-card">
+                <h4>Oggi</h4>
+                <div class="stat-item"><span>Max:</span> <b id="today-max-temp">--°C</b></div>
+                <div class="stat-item"><span>Min:</span> <b id="today-min-temp">--°C</b></div>
+                <div class="stat-item"><span>Umidità:</span> <b id="today-humidity">--%</b></div>
+                <div class="stat-item"><span>Precipitazioni:</span> <b id="today-rain">0mm</b></div>
+            </div>
+
+            <!-- Card Domani -->
+            <div class="weather-card tomorrow-card">
+                <h4>Domani</h4>
+                <div class="stat-item"><span>Max:</span> <b id="tomorrow-max-temp">--°C</b></div>
+                <div class="stat-item"><span>Min:</span> <b id="tomorrow-min-temp">--°C</b></div>
+                <div class="stat-item"><span>Umidità:</span> <b id="tomorrow-humidity">--%</b></div>
+                <div class="stat-item"><span>Precipitazioni:</span> <b id="tomorrow-rain">0mm</b></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- LOGICA INIZIALIZZATA A DOMContentLoaded -->
+    <script>
+        (function() {
+            // --- CONFIGURAZIONE API METEO ---
+            const WEATHER_API_URL = "https://api.open-meteo.com/v1/forecast?daily=temperature_2m_max,temperature_2m_min,precipitation_sum&hourly=relative_humidity_2m,windspeed_10m,is_day&timezone=Europe%2FBerlin";
+            const GEOCODING_API_URL = "https://geocoding-api.open-meteo.com/v1/search?name=";
+
+            // --- CAPOLUOGHI REGIONI ITALIANE ---
+            const italianCapitals = [
+                { name: "Aosta", region: "Valle d'Aosta" }, { name: "Torino", region: "Piemonte" },
+                { name: "Novara", region: "Piemonte" }, { name: "Milano", region: "Lombardia" },
+                { name: "Venezia", region: "Veneto" }, { name: "Padova", region: "Veneto" },
+                { name: "Bologna", region: "Emilia-Romagna" }, { name: "Parma", region: "Emilia-Romagna" },
+                { name: "Verona", region: "Veneto" }, { name: "Roma", region: "Lazio" },
+                { name: "Latina", region: "Lazio" }, { name: "Perugia", region: "Umbria" },
+                { name: "Firenze", region: "Toscana" }, { name: "Pistoia", region: "Toscana" },
+                { name: "Livorno", region: "Toscana" }, { name: "Ancona", region: "Marche" },
+                { name: "Pesaro", region: "Marche" }, { name: "Urbino", region: "Marche" },
+                { name: "Napoli", region: "Campania" }, { name: "Salerno", region: "Campania" },
+                { name: "Palermo", region: "Sicilia" }, { name: "Catania", region: "Sicilia" },
+                { name: "Agrigento", region: "Sicilia" }, { name: "Cagliari", region: "Sardegna" },
+                { name: "Nuoro", region: "Sardegna" }, { name: "Bari", region: "Puglia" },
+                { name: "Lecce", region: "Puglia" }, { name: "Trani", region: "Puglia" },
+                { name: "Catanzaro", region: "Calabria" }, { name: "Potenza", region: "Basilicata" },
+                { name: "L'Aquila", region: "Abruzzo" }, { name: "Chieti", region: "Abruzzo" },
+                { name: "Campobasso", region: "Molise" }, { name: "Trieste", region: "Friuli-Venezia Giulia" },
+                { name: "Udine", region: "Friuli-Venezia Giulia" }
+            ];
+
+            // --- TRADUZIONI (Multilingua) ---
+            const translations = {
+                it: { 
+                    maxTemp: "Max", minTemp: "Min", humidity: "Umidità", rain: "Precipitazioni", 
+                    today: "Oggi", tomorrow: "Domani", loading: "Caricamento meteo...", error: "Dati non disponibili"
+                },
+                en: { 
+                    maxTemp: "Max", minTemp: "Min", humidity: "Humidity", rain: "Precipitation", 
+                    today: "Today", tomorrow: "Tomorrow", loading: "Loading weather...", error: "Data not available"
+                },
+                es: { 
+                    maxTemp: "Máx", minTemp: "Mín", humidity: "Humedad", rain: "Lluvia", 
+                    today: "Hoy", tomorrow: "Mañana", loading: "Cargando clima...", error: "Datos no disponibles"
+                }
+            };
+
+            // --- ELEMENTI DOM ---
+            const selectCity = document.getElementById('city-select');
+            const placeholder = document.getElementById('weather-data-placeholder');
+            const detailsGrid = document.getElementById('weather-details-grid');
+
+            // --- POPOLAZIONE MENU A TENDINA ---
+            function populateDropdown() {
+                italianCapitals.forEach(city => {
+                    const option = document.createElement('option');
+                    option.value = city.name;
+                    option.textContent = `${city.region} - ${city.name}`;
+                    selectCity.appendChild(option);
+                });
+                
+                // Event Listeners
+                selectCity.addEventListener('change', (e) => fetchWeatherData(e.target.value));
+            }
+
+            // --- LOGICA METEO ---
+            async function fetchWeatherData(cityName) {
+                if (!cityName) return;
+
+                try {
+                    const t = getActiveLanguage(); // Recupera la lingua attiva dalla tua dashboard
+                    
+                    // 1. Geocoding: Trovare Lat/Lon per città + IT
+                    const geoResponse = await fetch(`${GEOCODING_API_URL}${cityName}&count=1&language=${t}&format=json`);
+                    const geoData = await geoResponse.json();
+
+                    if (geoData.results && geoData.results.length > 0) {
+                        const lat = geoData.results[0].latitude;
+                        const lon = geoData.results[0].longitude;
+
+                        // 2. Fetch Dati Meteo (Oggi e Domani)
+                        const weatherUrl = `${WEATHER_API_URL}&latitude=${lat}&longitude=${lon}`;
+                        const weatherResponse = await fetch(weatherUrl);
+                        const weatherData = await weatherResponse.json();
+
+                        // 3. Parsing Dati (Assumezione: primo valore daily = Oggi, secondo = Domani)
+                        const todayIndex = 0;
+                        const tomorrowIndex = 1;
+                        
+                        const updateUI = (index) => {
+                            const isMax = index === todayIndex ? document.getElementById('today-max-temp') : document.getElementById('tomorrow-max-temp');
+                            const isMin = index === todayIndex ? document.getElementById('today-min-temp') : document.getElementById('tomorrow-min-temp');
+                            const humidityEl = index === todayIndex ? document.getElementById('today-humidity') : document.getElementById('tomorrow-humidity');
+                            const rainEl = index === todayIndex ? document.getElementById('today-rain') : document.getElementById('tomorrow-rain');
+
+                            isMax.textContent = `${weatherData.daily.temperature_2m_max[index]}°C`;
+                            isMin.textContent = `${weatherData.daily.temperature_2m_min[index]}°C`;
+                            
+                            // Calcolo Umidità Media (ore 09-18 per approssimazione giornaliera)
+                            const h = weatherData.hourly.relative_humidity_2m;
+                            let sumHumidity = 0; 
+                            for(let i=0; i<24; i++) { sumHumidity += h[i]; } // Semplificazione: media semplice per snippet veloce
+                            humidityEl.textContent = `${Math.round(sumHumidity/24)}%`;
+
+                            rainEl.textContent = `${weatherData.daily.precipitation_sum[index]} mm`;
+                        };
+
+                        updateUI(todayIndex);
+                        updateUI(tomorrowIndex);
+
+                        // 4. Mostra Risultati
+                        placeholder.style.display = 'none';
+                        detailsGrid.style.display = 'grid';
+                    } else {
+                        throw new Error("City not found");
+                    }
+                } catch (error) {
+                    console.error("Weather API Error:", error);
+                    placeholder.textContent = translations[it || 'it'].error;
+                    placeholder.style.display = 'block';
+                    detailsGrid.style.display = 'none';
+                }
+            }
+
+            // --- FUNZIONI UTILI ---
+            function getActiveLanguage() {
+                const lang = localStorage.getItem('ui_language'); // Presume esista nella tua dashboard
+                return (lang && ['it','en','es'].includes(lang)) ? lang : 'it';
+            }
+
+            // --- INIZIALIZZAZIONE ---
+            populateDropdown();
+            
+            // Carica dati città default alla fine del caricamento DOM o su prima selezione
+            document.addEventListener('DOMContentLoaded', () => {
+               // Opzionale: Carica automaticamente la prima città dopo un po' di tempo
+               setTimeout(() => {
+                   const firstCity = selectCity.options[selectCity.options.length - 1].value;
+                   if(firstCity) fetchWeatherData(firstCity);
+               }, 500); 
+            });
+
+        })();
+    </script>
+
 
       // Calcolo Julian Day Number corretto (formula standard)
       let Y = year, M = month;
